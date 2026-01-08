@@ -1,1 +1,111 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
+body {
+  font-family: 'JetBrains Mono', monospace;
+  color: #eaeaea;
+  background:
+    linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)),
+    url("images/bg.jpg") center / cover no-repeat fixed;
+}
+
+/* HERO */
+.hero {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 3rem;
+  color: #00f2ff;
+  letter-spacing: 4px;
+  text-shadow: 0 0 25px rgba(0,242,255,0.7);
+}
+
+.timeline {
+  margin-top: 15px;
+  letter-spacing: 2px;
+}
+
+.past {
+  color: rgba(0,242,255,0.4);
+}
+
+.present {
+  color: rgba(0,242,255,1);
+}
+
+.future {
+  color: rgba(180,120,255,0.4);
+}
+
+.quote {
+  margin-top: 20px;
+  font-size: 0.85rem;
+  opacity: 0.5;
+}
+
+/* SECTIONS */
+.section {
+  padding: 80px 10%;
+  text-align: center;
+}
+
+.section h2 {
+  font-family: 'Orbitron', sans-serif;
+  color: #00f2ff;
+  margin-bottom: 15px;
+}
+
+.section p {
+  max-width: 500px;
+  margin: 0 auto 30px;
+  opacity: 0.7;
+}
+
+.section img {
+  width: 240px;
+  border-radius: 10px;
+  opacity: 0.85;
+  box-shadow: 0 0 30px rgba(0,242,255,0.2);
+}
+
+/* CLOCK */
+#clock {
+  font-size: 2rem;
+  letter-spacing: 3px;
+  color: #00f2ff;
+}
+
+/* CTA BUTTON */
+.cta {
+  height: 50vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn {
+  padding: 16px 40px;
+  border: 2px solid #00f2ff;
+  color: #00f2ff;
+  text-decoration: none;
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 2px;
+  transition: 0.3s ease;
+}
+
+.btn:hover {
+  background: #00f2ff;
+  color: #000;
+  box-shadow: 0 0 35px rgba(0,242,255,0.8);
+  transform: scale(1.05);
+}
