@@ -78,11 +78,55 @@ body {
   box-shadow: 0 0 30px rgba(0,242,255,0.2);
 }
 
-/* CLOCK */
-#clock {
-  font-size: 2rem;
-  letter-spacing: 3px;
-  color: #00f2ff;
+/* ANALOG CLOCK */
+.analog-clock {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  border: 2px solid rgba(0,242,255,0.6);
+  border-radius: 50%;
+  margin: 40px auto;
+  box-shadow: 0 0 30px rgba(0,242,255,0.3);
+}
+
+.hand {
+  position: absolute;
+  width: 50%;
+  height: 2px;
+  background: #00f2ff;
+  top: 50%;
+  left: 50%;
+  transform-origin: 0%;
+  transform: rotate(90deg);
+}
+
+.hour {
+  width: 35%;
+  height: 4px;
+  opacity: 0.8;
+}
+
+.minute {
+  width: 45%;
+  height: 3px;
+  opacity: 0.9;
+}
+
+.second {
+  width: 48%;
+  height: 2px;
+  background: #ff4d4d;
+}
+
+.center-dot {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: #00f2ff;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 /* CTA BUTTON */
