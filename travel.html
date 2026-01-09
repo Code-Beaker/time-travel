@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Time Travel – Explanation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'JetBrains Mono', monospace;
+      color: #eaeaea;
+      background:
+        linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)),
+        url("images/bg2.jpg") center / cover no-repeat fixed;
+      line-height: 1.6;
+    }
+
+    /* CONTENT */
+    .content {
+      max-width: 700px;
+      margin: auto;
+      padding: 80px 20px;
+    }
+
+    h2 {
+      font-family: 'Orbitron', sans-serif;
+      color: #00f2ff;
+      margin-top: 60px;
+      margin-bottom: 10px;
+    }
+
+    p {
+      opacity: 0.75;
+    }
+
+    img {
+      display: block;
+      width: 260px;
+      max-width: 90%;
+      margin: 30px auto;
+      border-radius: 10px;
+      opacity: 0.85;
+      box-shadow: 0 0 30px rgba(0,242,255,0.25);
+    }
+
+    /* CTA */
+    .cta {
+      text-align: center;
+      margin: 100px 0;
+    }
+
+    .btn {
+      padding: 16px 40px;
+      border: 2px solid #00f2ff;
+      color: #00f2ff;
+      text-decoration: none;
+      font-family: 'Orbitron', sans-serif;
+      letter-spacing: 2px;
+      transition: 0.3s ease;
+    }
+
+    .btn:hover {
+      background: #00f2ff;
+      color: #000;
+      box-shadow: 0 0 30px rgba(0,242,255,0.8);
+    }
+
+    /* FIXED CLOCKS */
+    .side-clock {
+      position: fixed;
+      top: 50%;
+      width: 120px;
+      height: 120px;
+      border: 2px solid rgba(0,242,255,0.5);
+      border-radius: 50%;
+      transform: translateY(-50%);
+      opacity: 0.45;
+      box-shadow: 0 0 20px rgba(0,242,255,0.3);
+    }
+
+    .left {
+      left: 20px;
+    }
+
+    .right {
+      right: 20px;
+    }
+
+    .hand {
+      position: absolute;
+      width: 50%;
+      height: 2px;
+      background: #00f2ff;
+      top: 50%;
+      left: 50%;
+      transform-origin: 0%;
+    }
+
+    .hour {
+      width: 35%;
+      height: 3px;
+    }
+
+    .minute {
+      width: 45%;
+    }
+
+    .second {
+      background: #ff4d4d;
+    }
+
+    .dot {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: #00f2ff;
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    /* Hide clocks on small screens */
+    @media (max-width: 768px) {
+      .side-clock {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LEFT CLOCK (PAST) -->
+  <div class="side-clock left">
+    <div class="hand hour" id="lh"></div>
+    <div class="hand minute" id="lm"></div>
+    <div class="hand second" id="ls"></div>
+    <div class="dot"></div>
+  </div>
+
+  <!-- RIGHT CLOCK (FUTURE) -->
+  <div class="side-clock right">
+    <div class="hand hour" id="rh"></div>
+    <div class="hand minute" id="rm"></div>
+    <div class="hand second" id="rs"></div>
+    <div class="dot"></div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="content">
+
+    <h2>What is Time Travel?</h2>
+    <p>
+      Time travel means moving through time instead of just moving forward with it.
+      Normally, we go from past to future without choice.
+      Time travel asks if that flow can be changed.
+    </p>
+
+    <h2>How Could Time Travel Work?</h2>
+    <p>
+      Time and space are connected.
+      If space bends, time bends too.
+      Controlling spacetime could mean controlling time.
+    </p>
+
+    <h2>Traveling to the Future ⏩</h2>
+    <p>
+      Moving extremely fast or staying near strong gravity slows time for you.
+      When you return, the world has aged more than you.
+      This form of time travel follows known physics.
+    </p>
+
+    <h2>Traveling to the Past ⏪</h2>
+    <p>
+      Going backward is much harder.
+      It requires time to loop back on itself.
+      This risks breaking cause and effect.
+    </p>
+
+    <h2>Wormholes 🌀</h2>
+    <p>
+      Wormholes are theoretical tunnels through spacetime.
+      They could connect different times.
+      Most are believed to be unstable.
+    </p>
+    <img src="images/wormhole2.jpg" alt="Wormhole">
+
+    <h2>Black Holes 🕳️</h2>
+    <p>
+      Black holes bend spacetime extremely.
+      Time slows down near them.
+      They show that time is not fixed.
+    </p>
+    <img src="images/blackhole.jpg" alt="Black Hole">
+
+    <h2>Paradoxes ⚠️</h2>
+    <p>
+      A paradox happens when time contradicts itself.
+      Changing the past can erase the reason you changed it.
+      This creates unstable timelines.
+    </p>
+
+    <h2>Famous Paradoxes 🧩</h2>
+    <p>
+      <strong>Grandfather Paradox:</strong>
+      If you go back and kill your grandfather, you would never be born.
+      So who traveled back to do it?
+    </p>
+    <p>
+      <strong>Bootstrap Paradox:</strong>
+      If something exists without a clear origin, where did it come from?
+    </p>
+
+    <h2>The Limit</h2>
+    <p>
+      Theories explain possibilities, not consequences.
+      Time may resist being changed.
+      That uncertainty is the danger.
+    </p>
+
+    <div class="cta">
+      <a href="#" class="btn">LET’S TIME TRAVEL 🚀</a>
+    </div>
+
+  </div>
+
+  <script>
+    let angle = 0;
+
+    setInterval(() => {
+      angle += 6;
+
+      // LEFT CLOCK (BACKWARD)
+      document.getElementById("ls").style.transform = `rotate(${-angle}deg)`;
+      document.getElementById("lm").style.transform = `rotate(${-angle / 12}deg)`;
+      document.getElementById("lh").style.transform = `rotate(${-angle / 144}deg)`;
+
+      // RIGHT CLOCK (FORWARD)
+      document.getElementById("rs").style.transform = `rotate(${angle}deg)`;
+      document.getElementById("rm").style.transform = `rotate(${angle / 12}deg)`;
+      document.getElementById("rh").style.transform = `rotate(${angle / 144}deg)`;
+    }, 200);
+  </script>
+
+</body>
+</html>
