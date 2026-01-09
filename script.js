@@ -1,13 +1,23 @@
-function updateClock() {
+function updateAnalogClock() {
   const now = new Date();
 
-  const hours = String(now.getHours()).padStart(2, '0');
-  const minutes = String(now.getMinutes()).padStart(2, '0');
-  const seconds = String(now.getSeconds()).padStart(2, '0');
+  const seconds = now.getSeconds();
+  const minutes = now.getMinutes();
+  const hours = now.getHours();
 
-  const timeString = `${hours}:${minutes}:${seconds}`;
-  document.getElementById("clock").textContent = timeString;
+  const secondDeg = seconds * 6;
+  const minuteDeg = minutes * 6 + seconds * 0.1;
+  const hourDeg = (hours % 12) * 30 + minutes * 0.5;
+
+  document.getElementById("second").style.transform =
+    `rotate(${secondDeg}deg)`;
+
+  document.getElementById("minute").style.transform =
+    `rotate(${minuteDeg}deg)`;
+
+  document.getElementById("hour").style.transform =
+    `rotate(${hourDeg}deg)`;
 }
 
-updateClock();              // run once immediately
-setInterval(updateClock, 1000); // update every second
+setInterval(updateAnalogClock, 1000);
+updateAnalogClock();
