@@ -26,9 +26,11 @@
 
     /* CONTENT */
     .content {
-      max-width: 700px;
-      margin: auto;
-      padding: 80px 20px;
+  max-width: 700px;
+  margin: auto;
+  padding: 80px 20px;
+  position: relative;
+  z-index: 2;
     }
 
     h2 {
@@ -76,15 +78,16 @@
 
     /* FIXED CLOCKS */
     .side-clock {
-      position: fixed;
-      top: 50%;
-      width: 120px;
-      height: 120px;
-      border: 2px solid rgba(0,242,255,0.5);
-      border-radius: 50%;
-      transform: translateY(-50%);
-      opacity: 0.45;
-      box-shadow: 0 0 20px rgba(0,242,255,0.3);
+  position: fixed;
+  top: 50%;
+  width: 160px;              /* BIGGER */
+  height: 160px;             /* BIGGER */
+  border: 2px solid rgba(0,242,255,0.4);
+  border-radius: 50%;
+  transform: translateY(-50%);
+  opacity: 0.25;             /* softer */
+  box-shadow: 0 0 25px rgba(0,242,255,0.25);
+  z-index: 0;                /* PUSH BEHIND TEXT */
     }
 
     .left {
@@ -129,12 +132,14 @@
       transform: translate(-50%, -50%);
     }
 
-    /* Hide clocks on small screens */
-    @media (max-width: 768px) {
-      .side-clock {
-        display: none;
-      }
-    }
+    /* mobile clock tuning */
+@media (max-width: 768px) {
+  .side-clock {
+    width: 200px;
+    height: 200px;
+    opacity: 0.18;
+  }
+}
   </style>
 </head>
 <body>
