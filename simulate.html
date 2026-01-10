@@ -11,7 +11,8 @@ body{background:black;overflow:hidden;font-family:Arial;color:white}
 
 /* ROTATE */
 #rotate{
-  position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  position:fixed;inset:0;
+  display:flex;align-items:center;justify-content:center;
   background:black;z-index:9999
 }
 
@@ -40,20 +41,28 @@ button:hover{background:#00f2ff;color:black}
   position:fixed;inset:0;
   display:flex;flex-direction:column;
   align-items:center;justify-content:center;
-  background:rgba(0,0,0,.4);
+  background:rgba(0,0,0,.45);
   opacity:0;transition:opacity 1.5s ease;
   z-index:5;pointer-events:none
 }
 
+/* CLOCK */
 #clock{
-  width:220px;height:220px;border:2px solid white;
-  border-radius:50%;position:relative
+  width:240px;height:240px;
+  border:2px solid white;border-radius:50%;
+  position:relative
+}
+
+.number{
+  position:absolute;
+  transform:translate(-50%,-50%);
+  font-size:14px;
 }
 
 .hand{position:absolute;top:50%;left:50%;transform-origin:0% 50%;background:white}
 .hour{width:35%;height:4px}
 .minute{width:50%;height:3px}
-.second{width:55%;height:2px;background:red}
+.second{width:60%;height:2px;background:red}
 
 .center-dot{
   width:8px;height:8px;background:white;border-radius:50%;
@@ -62,8 +71,8 @@ button:hover{background:#00f2ff;color:black}
 
 #dateText{
   margin-top:20px;
-  font-size:26px;
-  letter-spacing:3px;
+  font-size:22px;
+  letter-spacing:2px;
 }
 
 @media(orientation:landscape){#rotate{display:none}}
@@ -75,7 +84,7 @@ button:hover{background:#00f2ff;color:black}
 <div id="rotate"><h2>Rotate your device</h2></div>
 
 <div id="videoStage">
-  <video id="sceneVideo" playsinline muted preload="auto"></video>
+  <video id="sceneVideo" playsinline preload="auto"></video>
 </div>
 
 <div id="cockpit">
@@ -112,7 +121,7 @@ button:hover{background:#00f2ff;color:black}
     <div class="hand second"></div>
     <div class="center-dot"></div>
   </div>
-  <div id="dateText">YEAR</div>
+  <div id="dateText"></div>
 </div>
 
 <audio id="clockSound" src="audio/clock.mp3" preload="auto"></audio>
@@ -132,8 +141,22 @@ const dateText=document.getElementById("dateText");
 const clockSound=document.getElementById("clockSound");
 clockSound.loop=true;
 
-let chosenPath=null,chosenYear=null;
-let clockInterval=null,yearCounter=0,clockDir=1,angle=0;
+let chosenPath,chosenYear;
+let angle=0,clockInterval;
+let day=1,month=1,year=0,dir=1;
+
+/* ADD CLOCK NUMBERS */
+const clock=document.getElementById("clock");
+for(let i=1;i<=12;i++){
+  const n=document.createElement("div");
+  n.className="number";
+  n.innerText=i;
+  const r=100;
+  const a=(i-3)*30*Math.PI/180;
+  n.style.left=120+r*Math.cos(a)+"px";
+  n.style.top=120+r*Math.sin(a)+"px";
+  clock.appendChild(n);
+}
 
 function selectPath(p){
   chosenPath=p;
@@ -141,12 +164,14 @@ function selectPath(p){
   yearBtns.style.display="block";
   pastYears.style.display=p==="past"?"block":"none";
   futureYears.style.display=p==="future"?"block":"none";
+  aiText.innerText="Select destination year.";
 }
 
 function selectYear(y){
   chosenYear=y;
-  yearBtns.style.display="none";
   goBtn.style.display="block";
+  yearBtns.style.display="none";
+  aiText.innerText="Destination locked.";
 }
 
 function goBack(){
@@ -154,22 +179,38 @@ function goBack(){
   yearBtns.style.display="block";
 }
 
+function playVideo(src){
+  video.src=src;
+  video.muted=false;
+  video.play().catch(()=>{});
+}
+
 function takeOff(){
   controls.style.display="none";
   cockpit.style.display="none";
 
-  video.src="videos/launch.mp4";video.play();
+  aiText.innerText="Engines online. Launching.";
+  playVideo("videos/launch.mp4");
+
   video.onended=()=>{
-    video.src="videos/fly.mp4";video.play();
+    aiText.innerText="Leaving Earth orbit.";
+    playVideo("videos/fly.mp4");
+
     video.onended=()=>{
       cockpit.style.display="block";
       cockpitImg.src="images/cockpit_overlay.png";
 
-      video.src=chosenPath==="future"?"videos/blackhole.mp4":"videos/wormhole.mp4";
-      video.play();
+      if(chosenPath==="future"){
+        aiText.innerText="Approaching black hole.";
+        playVideo("videos/blackhole.mp4");
+      }else{
+        aiText.innerText="Entering wormhole.";
+        playVideo("videos/wormhole.mp4");
+      }
 
-      clockDir=chosenPath==="future"?1:-1;
-      yearCounter=chosenYear;
+      dir=chosenPath==="future"?1:-1;
+      year=chosenYear;
+      day=1;month=1;
 
       setTimeout(startClock,5000);
     }
@@ -178,18 +219,22 @@ function takeOff(){
 
 function startClock(){
   timeOverlay.style.opacity="1";
-  clockSound.play();
-  dateText.innerText=yearCounter;
+  clockSound.play().catch(()=>{});
 
   clockInterval=setInterval(()=>{
-    angle+=6*clockDir;
+    angle+=dir*20; // FAST
     secondHand.style.transform=`rotate(${angle}deg)`;
     minuteHand.style.transform=`rotate(${angle/12}deg)`;
     hourHand.style.transform=`rotate(${angle/144}deg)`;
 
-    yearCounter+=clockDir*3;
-    dateText.innerText=yearCounter;
-  },80);
+    day+=dir*2;
+    if(day>30){day=1;month++}
+    if(day<1){day=30;month--}
+    if(month>12){month=1;year++}
+    if(month<1){month=12;year--}
+
+    dateText.innerText=`${day}/${month}/${year}`;
+  },40);
 
   setTimeout(stopClock,15000);
 }
