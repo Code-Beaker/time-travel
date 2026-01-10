@@ -211,24 +211,42 @@ function startClock(){
   clockSound.play().catch(()=>{});
   aiText.innerText="Temporal distortion detected.";
 
-  clockInterval=setInterval(()=>{
-    angle+=dir*25;
-    secondHand.style.transform=`rotate(${angle}deg)`;
-    minuteHand.style.transform=`rotate(${angle/12}deg)`;
-    hourHand.style.transform=`rotate(${angle/144}deg)`;
+  // total years to travel
+const totalYears = Math.abs(chosenYear - year);
 
-    day+=dir*3;
-    if(day>30){day=1;month++}
-    if(day<1){day=30;month--}
-    if(month>12){month=1;year++}
-    if(month<1){month=12;year--}
+// clock runs ~10 seconds
+const totalTicks = 250; // 250 ticks ≈ 10s at 40ms
+let tickCount = 0;
 
-    dateText.innerText=`${day}/${month}/${year}`;
+// dynamic year jump per tick
+const yearStep = Math.max(1, Math.ceil(totalYears / totalTicks));
 
-    if(year===chosenYear){
-      stopClock();
-    }
-  },35);
+clockInterval = setInterval(() => {
+  tickCount++;
+
+  // 🔥 MUCH FASTER CLOCK
+  angle += dir * 60;
+  secondHand.style.transform = `rotate(${angle}deg)`;
+  minuteHand.style.transform = `rotate(${angle / 10}deg)`;
+  hourHand.style.transform = `rotate(${angle / 120}deg)`;
+
+  // DATE FAST FORWARD / BACKWARD
+  year += dir * yearStep;
+
+  // clamp to destination
+  if (
+    (dir === 1 && year >= chosenYear) ||
+    (dir === -1 && year <= chosenYear)
+  ) {
+    year = chosenYear;
+    dateText.innerText = `01/01/${year}`;
+    stopClock();
+    return;
+  }
+
+  dateText.innerText = `01/01/${year}`;
+
+}, 40);
 }
 
 function stopClock(){
