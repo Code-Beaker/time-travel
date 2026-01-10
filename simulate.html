@@ -17,7 +17,7 @@ video{width:100vw;height:100vh;object-fit:cover}
 #cockpit{position:fixed;inset:0;z-index:3;pointer-events:none}
 #cockpit img{width:100%;height:100%;object-fit:cover}
 
-/* AI TEXT */
+/* AI */
 #ai{
   position:fixed;
   bottom:20px;
@@ -57,16 +57,15 @@ button:hover{background:#00f2ff;color:black}
 
 /* CLOCK */
 #clock{
-  width:240px;
-  height:240px;
+  width:240px;height:240px;
   border:2px solid white;
   border-radius:50%;
   position:relative;
 }
+.number{position:absolute;transform:translate(-50%,-50%);font-size:14px}
 .hand{
   position:absolute;
-  top:50%;
-  left:50%;
+  top:50%;left:50%;
   transform-origin:0% 50%;
   transform:translateY(-50%);
   background:white;
@@ -75,30 +74,36 @@ button:hover{background:#00f2ff;color:black}
 .minute{width:50%;height:3px}
 .second{width:50%;height:2px;background:red}
 .center-dot{
-  width:8px;height:8px;
-  background:white;border-radius:50%;
-  position:absolute;
-  top:50%;left:50%;
+  width:8px;height:8px;background:white;
+  border-radius:50%;
+  position:absolute;top:50%;left:50%;
   transform:translate(-50%,-50%);
 }
 #dateText{margin-top:20px;font-size:24px}
 
-/* FLASHES */
-#flashWhite, #flashBlue{
-  position:fixed;
-  inset:0;
+/* FLASH */
+#flash{
+  position:fixed;inset:0;
+  background:white;
   opacity:0;
   z-index:10;
   pointer-events:none;
   transition:opacity .4s ease;
 }
-#flashWhite{background:white}
-#flashBlue{background:#0b1c2d}
 
-/* 404 SCREEN */
+/* BLUE FLASH */
+#blueFlash{
+  position:fixed;inset:0;
+  background:#0b1c2d;
+  opacity:0;
+  z-index:11;
+  pointer-events:none;
+  transition:opacity .4s ease;
+}
+
+/* 404 */
 #notFound{
-  position:fixed;
-  inset:0;
+  position:fixed;inset:0;
   background:#0e0e0e;
   color:#d0d0d0;
   display:none;
@@ -106,34 +111,24 @@ button:hover{background:#00f2ff;color:black}
   justify-content:center;
   flex-direction:column;
   z-index:20;
-  font-family:Arial;
 }
-#notFound h1{
-  font-size:96px;
-  margin-bottom:10px;
-}
-#notFound p{
-  opacity:.7;
-}
+#notFound h1{font-size:96px}
+#notFound p{opacity:.7}
 </style>
 </head>
 
 <body>
 
-<!-- VIDEO -->
 <div id="videoStage">
   <video id="sceneVideo" playsinline preload="auto"></video>
 </div>
 
-<!-- COCKPIT -->
 <div id="cockpit">
   <img id="cockpitImg" src="images/cockpit_ground.png">
 </div>
 
-<!-- AI -->
 <div id="ai"><p id="aiText">System online.</p></div>
 
-<!-- CONTROLS -->
 <div id="controls">
   <div id="pathBtns">
     <button onclick="selectPath('past')">PAST</button>
@@ -157,7 +152,6 @@ button:hover{background:#00f2ff;color:black}
   </div>
 </div>
 
-<!-- TIME OVERLAY -->
 <div id="timeOverlay">
   <div id="clock">
     <div class="hand hour"></div>
@@ -168,11 +162,9 @@ button:hover{background:#00f2ff;color:black}
   <div id="dateText"></div>
 </div>
 
-<!-- FLASHES -->
-<div id="flashWhite"></div>
-<div id="flashBlue"></div>
+<div id="flash"></div>
+<div id="blueFlash"></div>
 
-<!-- 404 -->
 <div id="notFound">
   <h1>404</h1>
   <p>Page not found</p>
@@ -185,13 +177,26 @@ const video=document.getElementById("sceneVideo");
 const cockpit=document.getElementById("cockpit");
 const cockpitImg=document.getElementById("cockpitImg");
 const aiText=document.getElementById("aiText");
-const flashWhite=document.getElementById("flashWhite");
-const flashBlue=document.getElementById("flashBlue");
+const flash=document.getElementById("flash");
+const blueFlash=document.getElementById("blueFlash");
 const notFound=document.getElementById("notFound");
 const timeOverlay=document.getElementById("timeOverlay");
 const clockSound=document.getElementById("clockSound");
 
 let chosenPath, chosenYear;
+let angle=0, clockInterval;
+let year=2026, dir=1;
+
+/* CLOCK NUMBERS */
+const clock=document.getElementById("clock");
+for(let i=1;i<=12;i++){
+  const n=document.createElement("div");
+  n.className="number";n.innerText=i;
+  const r=100,a=(i-3)*30*Math.PI/180;
+  n.style.left=120+r*Math.cos(a)+"px";
+  n.style.top=120+r*Math.sin(a)+"px";
+  clock.appendChild(n);
+}
 
 function selectPath(p){
   chosenPath=p;
@@ -223,39 +228,79 @@ function playVideo(src){
 function takeOff(){
   controls.style.display="none";
   cockpit.style.display="none";
-  aiText.innerText="Launching.";
+  aiText.innerText="Engines online. Launching.";
 
   playVideo("videos/launch.mp4");
 
   video.onended=()=>{
+    aiText.innerText="Leaving Earth orbit.";
     playVideo("videos/fly.mp4");
 
     video.onended=()=>{
       cockpit.style.display="block";
       cockpitImg.src="images/cockpit_overlay.png";
 
-      if(chosenPath==="past"){
-        playVideo("videos/wormhole.mp4");
-      }else{
+      if(chosenPath==="future"){
+        aiText.innerText="Approaching black hole.";
         playVideo("videos/blackhole.mp4");
+      }else{
+        aiText.innerText="Entering wormhole.";
+        playVideo("videos/wormhole.mp4");
       }
 
-      video.onended=()=>{
-        arrival();
-      }
+      dir=chosenPath==="future"?1:-1;
+      year=2026;
+
+      setTimeout(startClock,5000);
     }
   }
 }
 
-function arrival(){
+function startClock(){
+  timeOverlay.style.opacity="1";
+  clockSound.play().catch(()=>{});
+  aiText.innerText="Temporal distortion detected.";
+
+  const totalYears=Math.abs(chosenYear-year);
+  const step=Math.max(1,Math.ceil(totalYears/200));
+
+  clockInterval=setInterval(()=>{
+    angle+=dir*70;
+    document.querySelector(".second").style.transform=`rotate(${angle}deg)`;
+    document.querySelector(".minute").style.transform=`rotate(${angle/10}deg)`;
+    document.querySelector(".hour").style.transform=`rotate(${angle/120}deg)`;
+
+    year+=dir*step;
+    document.getElementById("dateText").innerText=`01/01/${year}`;
+
+    if((dir===1&&year>=chosenYear)||(dir===-1&&year<=chosenYear)){
+      stopClock();
+    }
+  },40);
+}
+
+function stopClock(){
+  clearInterval(clockInterval);
+  clockSound.pause();
+  timeOverlay.style.display="none";
+  aiText.innerText="Timeline reached.";
+
+  flash.style.opacity="1";
+  setTimeout(()=>{
+    flash.style.opacity="0";
+    playArrival();
+  },2000);
+}
+
+function playArrival(){
   cockpit.style.display="none";
   playVideo("videos/arrival.mp4");
 
   video.onended=()=>{
     if(chosenPath==="past"){
-      flashBlue.style.opacity="1";
+      blueFlash.style.opacity="1";
       setTimeout(()=>{
-        flashBlue.style.opacity="0";
+        blueFlash.style.opacity="0";
         show404();
       },800);
     }
@@ -264,9 +309,6 @@ function arrival(){
 
 function show404(){
   notFound.style.display="flex";
-  setTimeout(()=>{
-    // next phase will override this
-  },2000);
 }
 </script>
 
