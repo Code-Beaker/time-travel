@@ -6,11 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       background: black;
@@ -31,7 +27,7 @@
       z-index: 9999;
     }
 
-    /* VIDEO LAYER */
+    /* VIDEO */
     #videoStage {
       position: fixed;
       inset: 0;
@@ -44,12 +40,13 @@
       object-fit: cover;
     }
 
-    /* COCKPIT OVERLAY */
+    /* COCKPIT */
     #cockpit {
       position: fixed;
       inset: 0;
       z-index: 3;
       pointer-events: none;
+      display: none;
     }
 
     #cockpit img {
@@ -58,7 +55,7 @@
       object-fit: cover;
     }
 
-    /* AI CONSOLE */
+    /* AI TEXT */
     #ai {
       position: fixed;
       bottom: 20px;
@@ -86,33 +83,30 @@
       cursor: pointer;
     }
 
-    /* LANDSCAPE ONLY */
     @media (orientation: landscape) {
-      #rotate {
-        display: none;
-      }
+      #rotate { display: none; }
     }
   </style>
 </head>
 
 <body>
 
-  <!-- ROTATE SCREEN -->
+  <!-- ROTATE -->
   <div id="rotate">
     <h2>Rotate your device to begin</h2>
   </div>
 
-  <!-- VIDEO STAGE -->
+  <!-- VIDEO -->
   <div id="videoStage">
     <video id="sceneVideo" playsinline muted></video>
   </div>
 
   <!-- COCKPIT -->
   <div id="cockpit">
-    <img id="cockpitImg" src="images/cockpit_ground.png" />
+    <img id="cockpitImg" src="images/cockpit_overlay.png" />
   </div>
 
-  <!-- AI TEXT -->
+  <!-- AI -->
   <div id="ai">
     <p id="aiText">System online. Location: Earth.</p>
   </div>
@@ -129,7 +123,6 @@
         <button onclick="selectYear(1897)">1897</button>
         <button onclick="selectYear(1987)">1987</button>
       </div>
-
       <div id="futureYears" style="display:none;">
         <button onclick="selectYear(2050)">2050</button>
         <button onclick="selectYear(3079)">3079</button>
@@ -143,21 +136,18 @@
 
   <script>
     const video = document.getElementById("sceneVideo");
-    const cockpit = document.getElementById("cockpitImg");
+    const cockpit = document.getElementById("cockpit");
     const aiText = document.getElementById("aiText");
 
     let chosenPath = null;
-    let chosenYear = null;
 
     function selectPath(type) {
       chosenPath = type;
-
       document.getElementById("pathBtns").style.display = "none";
       document.getElementById("yearBtns").style.display = "block";
 
       document.getElementById("pastYears").style.display =
         type === "past" ? "block" : "none";
-
       document.getElementById("futureYears").style.display =
         type === "future" ? "block" : "none";
 
@@ -168,32 +158,58 @@
     }
 
     function selectYear(year) {
-      chosenYear = year;
       document.getElementById("yearBtns").style.display = "none";
       document.getElementById("goBtn").style.display = "block";
       aiText.innerText = "Destination locked: " + year;
     }
 
     function takeOff() {
+      // LAUNCH (outside)
+      cockpit.style.display = "none";
       video.src = "videos/launch.mp4";
       video.muted = true;
       video.play().catch(() => {});
+      video.onplay = () => video.muted = false;
 
-      cockpit.src = "images/cockpit_overlay.png";
-      aiText.innerText = "Engines online. Leaving Earth.";
+      aiText.innerText = "Engines online. Launching.";
 
       video.onended = () => {
-        if (chosenPath === "future") {
-          video.src = "videos/blackhole.mp4";
+        // FLY ABOVE EARTH (outside)
+        cockpit.style.display = "none";
+        video.src = "videos/fly.mp4";
+        video.muted = true;
+        video.play().catch(() => {});
+        video.onplay = () => video.muted = false;
+
+        aiText.innerText = "Leaving Earth orbit.";
+
+        video.onended = () => {
+          // DANGER ZONE (inside cockpit)
+          cockpit.style.display = "block";
+
+          if (chosenPath === "future") {
+            video.src = "videos/blackhole.mp4";
+            aiText.innerText = "Approaching black hole.";
+          } else {
+            video.src = "videos/wormhole.mp4";
+            aiText.innerText = "Entering wormhole.";
+          }
+
           video.muted = true;
           video.play().catch(() => {});
-          aiText.innerText = "Approaching black hole.";
-        } else {
-          video.src = "videos/wormhole.mp4";
-          video.muted = true;
-          video.play().catch(() => {});
-          aiText.innerText = "Entering wormhole.";
-        }
+          video.onplay = () => video.muted = false;
+
+          video.onended = () => {
+            // ARRIVAL (outside)
+            cockpit.style.display = "none";
+            video.src = "videos/arrival.mp4";
+            video.muted = true;
+            video.play().catch(() => {});
+            video.onplay = () => video.muted = false;
+
+            aiText.innerText = "Timeline reached.";
+          };
+        };
       };
     }
   </script>
