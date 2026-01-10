@@ -52,28 +52,20 @@ button:hover{background:#00f2ff;color:black}
   border:2px solid white;border-radius:50%;
   position:relative
 }
-
 .number{
-  position:absolute;
-  transform:translate(-50%,-50%);
-  font-size:14px;
+  position:absolute;transform:translate(-50%,-50%);
+  font-size:14px
 }
-
 .hand{position:absolute;top:50%;left:50%;transform-origin:0% 50%;background:white}
 .hour{width:35%;height:4px}
 .minute{width:50%;height:3px}
 .second{width:60%;height:2px;background:red}
-
 .center-dot{
   width:8px;height:8px;background:white;border-radius:50%;
   position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)
 }
 
-#dateText{
-  margin-top:20px;
-  font-size:22px;
-  letter-spacing:2px;
-}
+#dateText{margin-top:20px;font-size:24px;letter-spacing:2px}
 
 @media(orientation:landscape){#rotate{display:none}}
 </style>
@@ -143,16 +135,14 @@ clockSound.loop=true;
 
 let chosenPath,chosenYear;
 let angle=0,clockInterval;
-let day=1,month=1,year=0,dir=1;
+let day=1,month=1,year=2026,dir=1;
 
-/* ADD CLOCK NUMBERS */
+/* CLOCK NUMBERS */
 const clock=document.getElementById("clock");
 for(let i=1;i<=12;i++){
   const n=document.createElement("div");
-  n.className="number";
-  n.innerText=i;
-  const r=100;
-  const a=(i-3)*30*Math.PI/180;
+  n.className="number";n.innerText=i;
+  const r=100,a=(i-3)*30*Math.PI/180;
   n.style.left=120+r*Math.cos(a)+"px";
   n.style.top=120+r*Math.sin(a)+"px";
   clock.appendChild(n);
@@ -188,8 +178,8 @@ function playVideo(src){
 function takeOff(){
   controls.style.display="none";
   cockpit.style.display="none";
-
   aiText.innerText="Engines online. Launching.";
+
   playVideo("videos/launch.mp4");
 
   video.onended=()=>{
@@ -201,16 +191,15 @@ function takeOff(){
       cockpitImg.src="images/cockpit_overlay.png";
 
       if(chosenPath==="future"){
-        aiText.innerText="Approaching black hole.";
+        aiText.innerText="Approaching black hole. Extreme gravity detected.";
         playVideo("videos/blackhole.mp4");
       }else{
-        aiText.innerText="Entering wormhole.";
+        aiText.innerText="Entering wormhole. Spacetime instability detected.";
         playVideo("videos/wormhole.mp4");
       }
 
       dir=chosenPath==="future"?1:-1;
-      year=chosenYear;
-      day=1;month=1;
+      day=1;month=1;year=2026;
 
       setTimeout(startClock,5000);
     }
@@ -220,28 +209,32 @@ function takeOff(){
 function startClock(){
   timeOverlay.style.opacity="1";
   clockSound.play().catch(()=>{});
+  aiText.innerText="Temporal distortion detected.";
 
   clockInterval=setInterval(()=>{
-    angle+=dir*20; // FAST
+    angle+=dir*25;
     secondHand.style.transform=`rotate(${angle}deg)`;
     minuteHand.style.transform=`rotate(${angle/12}deg)`;
     hourHand.style.transform=`rotate(${angle/144}deg)`;
 
-    day+=dir*2;
+    day+=dir*3;
     if(day>30){day=1;month++}
     if(day<1){day=30;month--}
     if(month>12){month=1;year++}
     if(month<1){month=12;year--}
 
     dateText.innerText=`${day}/${month}/${year}`;
-  },40);
 
-  setTimeout(stopClock,15000);
+    if(year===chosenYear){
+      stopClock();
+    }
+  },35);
 }
 
 function stopClock(){
   clearInterval(clockInterval);
   clockSound.pause();
+  aiText.innerText="Timeline reached.";
 }
 </script>
 
