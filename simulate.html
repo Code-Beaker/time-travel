@@ -228,7 +228,7 @@
           // BLACK HOLE LOOP (last 2s)
           if (chosenPath === "future") {
             video.onloadedmetadata = () => {
-              const loopStart = Math.max(0, video.duration - 2);
+              const loopStart = Math.max(0, video.duration - 1);
               video.ontimeupdate = () => {
                 if (video.currentTime >= video.duration - 0.1) {
                   video.currentTime = loopStart;
