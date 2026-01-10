@@ -145,6 +145,9 @@
   </style>
 </head>
 <body>
+  <audio id="bg-audio" autoplay loop>
+  <source src="audio/tick.mp3" type="audio/mpeg">
+  </audio>
 
   <!-- LEFT CLOCK (PAST) -->
   <div class="side-clock left">
@@ -241,6 +244,8 @@
   </div>
 
   <script>
+    const audio = document.getElementById("bg-audio");
+audio.volume = 0.25;
     let angle = 0;
 
     setInterval(() => {
