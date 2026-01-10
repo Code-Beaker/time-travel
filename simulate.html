@@ -46,7 +46,7 @@
       inset: 0;
       z-index: 3;
       pointer-events: none;
-      display: none;
+      display: block;
     }
 
     #cockpit img {
@@ -75,12 +75,25 @@
     }
 
     button {
-      background: transparent;
-      border: 1px solid white;
-      color: white;
-      padding: 10px 16px;
+      background: rgba(0, 242, 255, 0.15);
+      border: 1px solid #00f2ff;
+      color: #00f2ff;
+      padding: 12px 18px;
       margin-left: 10px;
       cursor: pointer;
+      font-weight: bold;
+      letter-spacing: 1px;
+      transition: all 0.25s ease;
+    }
+
+    button:hover {
+      background: #00f2ff;
+      color: black;
+      box-shadow: 0 0 20px rgba(0,242,255,0.8);
+    }
+
+    button:active {
+      transform: scale(0.95);
     }
 
     @media (orientation: landscape) {
@@ -98,12 +111,12 @@
 
   <!-- VIDEO -->
   <div id="videoStage">
-    <video id="sceneVideo" playsinline muted></video>
+    <video id="sceneVideo" playsinline muted preload="auto"></video>
   </div>
 
   <!-- COCKPIT -->
   <div id="cockpit">
-    <img id="cockpitImg" src="images/cockpit_overlay.png" />
+    <img id="cockpitImg" src="images/cockpit_ground.png" />
   </div>
 
   <!-- AI -->
@@ -130,6 +143,7 @@
     </div>
 
     <div id="goBtn" style="display:none;">
+      <button onclick="goBack()">← BACK</button>
       <button onclick="takeOff()">TAKE OFF 🚀</button>
     </div>
   </div>
@@ -137,6 +151,7 @@
   <script>
     const video = document.getElementById("sceneVideo");
     const cockpit = document.getElementById("cockpit");
+    const cockpitImg = document.getElementById("cockpitImg");
     const aiText = document.getElementById("aiText");
 
     let chosenPath = null;
@@ -163,10 +178,19 @@
       aiText.innerText = "Destination locked: " + year;
     }
 
+    function goBack() {
+      document.getElementById("goBtn").style.display = "none";
+      document.getElementById("yearBtns").style.display = "block";
+      aiText.innerText = "Choose a different destination year.";
+    }
+
     function takeOff() {
+      document.getElementById("controls").style.display = "none";
+
       // LAUNCH (outside)
       cockpit.style.display = "none";
       video.src = "videos/launch.mp4";
+      video.load();
       video.muted = true;
       video.play().catch(() => {});
       video.onplay = () => video.muted = false;
@@ -174,9 +198,9 @@
       aiText.innerText = "Engines online. Launching.";
 
       video.onended = () => {
-        // FLY ABOVE EARTH (outside)
-        cockpit.style.display = "none";
+        // FLY (outside)
         video.src = "videos/fly.mp4";
+        video.load();
         video.muted = true;
         video.play().catch(() => {});
         video.onplay = () => video.muted = false;
@@ -184,31 +208,35 @@
         aiText.innerText = "Leaving Earth orbit.";
 
         video.onended = () => {
-          // DANGER ZONE (inside cockpit)
+          // DANGER ZONE (inside)
           cockpit.style.display = "block";
+          cockpitImg.src = "images/cockpit_overlay.png";
 
           if (chosenPath === "future") {
             video.src = "videos/blackhole.mp4";
-            aiText.innerText = "Approaching black hole.";
+            aiText.innerText = "Approaching black hole. Time dilation extreme.";
           } else {
             video.src = "videos/wormhole.mp4";
             aiText.innerText = "Entering wormhole.";
           }
 
+          video.load();
           video.muted = true;
           video.play().catch(() => {});
           video.onplay = () => video.muted = false;
 
-          video.onended = () => {
-            // ARRIVAL (outside)
-            cockpit.style.display = "none";
-            video.src = "videos/arrival.mp4";
-            video.muted = true;
-            video.play().catch(() => {});
-            video.onplay = () => video.muted = false;
-
-            aiText.innerText = "Timeline reached.";
-          };
+          // BLACK HOLE LOOP (last 2s)
+          if (chosenPath === "future") {
+            video.onloadedmetadata = () => {
+              const loopStart = Math.max(0, video.duration - 2);
+              video.ontimeupdate = () => {
+                if (video.currentTime >= video.duration - 0.1) {
+                  video.currentTime = loopStart;
+                  video.play().catch(() => {});
+                }
+              };
+            };
+          }
         };
       };
     }
