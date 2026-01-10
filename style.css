@@ -72,10 +72,10 @@ body {
 }
 
 .section img {
-  width: 240px;
-  border-radius: 10px;
-  opacity: 0.85;
-  box-shadow: 0 0 30px rgba(0,242,255,0.2);
+    width: 240px;
+    border-radius: 10px;
+    opacity: 0.9;
+    box-shadow: none; /* remove blue glow */
 }
 
 /* ANALOG CLOCK */
