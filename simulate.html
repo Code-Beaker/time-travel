@@ -119,8 +119,21 @@
 
   <!-- CONTROLS -->
   <div id="controls">
+  <div id="pathBtns">
     <button onclick="selectPath('past')">PAST</button>
     <button onclick="selectPath('future')">FUTURE</button>
+  </div>
+
+  <div id="yearBtns" style="display:none;">
+    <button onclick="selectYear(1897)">1897</button>
+    <button onclick="selectYear(1987)">1987</button>
+    <button onclick="selectYear(2050)">2050</button>
+    <button onclick="selectYear(3079)">3079</button>
+  </div>
+
+  <div id="goBtn" style="display:none;">
+    <button onclick="takeOff()">TAKE OFF 🚀</button>
+  </div>
   </div>
 
   <script>
@@ -141,6 +154,43 @@
         cockpit.src = "images/cockpit_overlay.png";
       }
     }
+    let chosenPath = null;
+let chosenYear = null;
+
+function selectPath(type) {
+  chosenPath = type;
+  document.getElementById("pathBtns").style.display = "none";
+  document.getElementById("yearBtns").style.display = "block";
+
+  aiText.innerText =
+    type === "future"
+      ? "Future selected. Choose a destination year."
+      : "Past selected. Choose a destination year.";
+}
+
+function selectYear(year) {
+  chosenYear = year;
+  document.getElementById("yearBtns").style.display = "none";
+  document.getElementById("goBtn").style.display = "block";
+  aiText.innerText = "Destination locked: " + year;
+}
+
+function takeOff() {
+  video.src = "videos/launch.mp4";
+  cockpit.src = "images/cockpit_overlay.png";
+
+  aiText.innerText = "Engines online. Leaving Earth.";
+
+  video.onended = () => {
+    if (chosenPath === "future") {
+      video.src = "videos/blackhole.mp4";
+      aiText.innerText = "Approaching black hole.";
+    } else {
+      video.src = "videos/wormhole.mp4";
+      aiText.innerText = "Entering wormhole.";
+    }
+  };
+}
   </script>
 
 </body>
