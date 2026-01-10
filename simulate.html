@@ -185,23 +185,26 @@ function selectYear(year) {
   document.getElementById("goBtn").style.display = "block";
   aiText.innerText = "Destination locked: " + year;
 }
-
 function takeOff() {
   video.src = "videos/launch.mp4";
-  cockpit.src = "images/cockpit_overlay.png";
+  video.play();   // 🔥 FORCE PLAY
 
+  cockpit.src = "images/cockpit_overlay.png";
   aiText.innerText = "Engines online. Leaving Earth.";
 
   video.onended = () => {
     if (chosenPath === "future") {
       video.src = "videos/blackhole.mp4";
+      video.play();   // 🔥 FORCE PLAY
       aiText.innerText = "Approaching black hole.";
     } else {
       video.src = "videos/wormhole.mp4";
+      video.play();   // 🔥 FORCE PLAY
       aiText.innerText = "Entering wormhole.";
     }
   };
 }
+
   </script>
 
 </body>
