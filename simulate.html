@@ -57,78 +57,81 @@ button:hover{background:#00f2ff;color:black}
 
 /* CLOCK */
 #clock{
-  width:240px;height:240px;
+  width:240px;
+  height:240px;
   border:2px solid white;
   border-radius:50%;
   position:relative;
 }
-.number{position:absolute;transform:translate(-50%,-50%);font-size:14px}
+
+.number{
+  position:absolute;
+  transform:translate(-50%,-50%);
+  font-size:14px;
+}
+
 .hand{
   position:absolute;
-  top:50%;left:50%;
+  top:50%;
+  left:50%;
   transform-origin:0% 50%;
   transform:translateY(-50%);
   background:white;
 }
+
 .hour{width:35%;height:4px}
 .minute{width:50%;height:3px}
-.second{width:50%;height:2px;background:red}
+.second{
+  width:50%;
+  height:2px;
+  background:red;
+}
+
 .center-dot{
-  width:8px;height:8px;background:white;
+  width:8px;height:8px;
+  background:white;
   border-radius:50%;
-  position:absolute;top:50%;left:50%;
+  position:absolute;
+  top:50%;
+  left:50%;
   transform:translate(-50%,-50%);
 }
-#dateText{margin-top:20px;font-size:24px}
 
-/* FLASH */
+#dateText{
+  margin-top:20px;
+  font-size:24px;
+  letter-spacing:2px;
+}
+
+/* WHITE FLASH */
 #flash{
-  position:fixed;inset:0;
+  position:fixed;
+  inset:0;
   background:white;
   opacity:0;
   z-index:10;
   pointer-events:none;
   transition:opacity .4s ease;
 }
-
-/* BLUE FLASH */
-#blueFlash{
-  position:fixed;inset:0;
-  background:#0b1c2d;
-  opacity:0;
-  z-index:11;
-  pointer-events:none;
-  transition:opacity .4s ease;
-}
-
-/* 404 */
-#notFound{
-  position:fixed;inset:0;
-  background:#0e0e0e;
-  color:#d0d0d0;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  flex-direction:column;
-  z-index:20;
-}
-#notFound h1{font-size:96px}
-#notFound p{opacity:.7}
 </style>
 </head>
 
 <body>
 
+<!-- VIDEO -->
 <div id="videoStage">
   <video id="sceneVideo" playsinline preload="auto"></video>
 </div>
 
+<!-- COCKPIT -->
 <div id="cockpit">
   <img id="cockpitImg" src="images/cockpit_ground.png">
 </div>
 
+<!-- AI -->
 <div id="ai"><p id="aiText">System online.</p></div>
 
+<!-- CONTROLS -->
 <div id="controls">
   <div id="pathBtns">
     <button onclick="selectPath('past')">PAST</button>
@@ -152,6 +155,7 @@ button:hover{background:#00f2ff;color:black}
   </div>
 </div>
 
+<!-- TIME OVERLAY -->
 <div id="timeOverlay">
   <div id="clock">
     <div class="hand hour"></div>
@@ -162,13 +166,8 @@ button:hover{background:#00f2ff;color:black}
   <div id="dateText"></div>
 </div>
 
+<!-- FLASH -->
 <div id="flash"></div>
-<div id="blueFlash"></div>
-
-<div id="notFound">
-  <h1>404</h1>
-  <p>Page not found</p>
-</div>
 
 <audio id="clockSound" src="audio/clock.mp3" preload="auto"></audio>
 
@@ -177,22 +176,30 @@ const video=document.getElementById("sceneVideo");
 const cockpit=document.getElementById("cockpit");
 const cockpitImg=document.getElementById("cockpitImg");
 const aiText=document.getElementById("aiText");
-const flash=document.getElementById("flash");
-const blueFlash=document.getElementById("blueFlash");
-const notFound=document.getElementById("notFound");
-const timeOverlay=document.getElementById("timeOverlay");
-const clockSound=document.getElementById("clockSound");
 
-let chosenPath, chosenYear;
-let angle=0, clockInterval;
-let year=2026, dir=1;
+const timeOverlay=document.getElementById("timeOverlay");
+const hourHand=document.querySelector(".hour");
+const minuteHand=document.querySelector(".minute");
+const secondHand=document.querySelector(".second");
+const dateText=document.getElementById("dateText");
+
+const flash=document.getElementById("flash");
+
+const clockSound=document.getElementById("clockSound");
+clockSound.loop=true;
+
+let chosenPath,chosenYear;
+let angle=0,clockInterval;
+let year=2026,dir=1;
 
 /* CLOCK NUMBERS */
 const clock=document.getElementById("clock");
 for(let i=1;i<=12;i++){
   const n=document.createElement("div");
-  n.className="number";n.innerText=i;
-  const r=100,a=(i-3)*30*Math.PI/180;
+  n.className="number";
+  n.innerText=i;
+  const r=100;
+  const a=(i-3)*30*Math.PI/180;
   n.style.left=120+r*Math.cos(a)+"px";
   n.style.top=120+r*Math.sin(a)+"px";
   clock.appendChild(n);
@@ -262,28 +269,36 @@ function startClock(){
   aiText.innerText="Temporal distortion detected.";
 
   const totalYears=Math.abs(chosenYear-year);
-  const step=Math.max(1,Math.ceil(totalYears/200));
+  const ticks=200;
+  const step=Math.max(1,Math.ceil(totalYears/ticks));
 
   clockInterval=setInterval(()=>{
     angle+=dir*70;
-    document.querySelector(".second").style.transform=`rotate(${angle}deg)`;
-    document.querySelector(".minute").style.transform=`rotate(${angle/10}deg)`;
-    document.querySelector(".hour").style.transform=`rotate(${angle/120}deg)`;
+    secondHand.style.transform=`rotate(${angle}deg)`;
+    minuteHand.style.transform=`rotate(${angle/10}deg)`;
+    hourHand.style.transform=`rotate(${angle/120}deg)`;
 
     year+=dir*step;
-    document.getElementById("dateText").innerText=`01/01/${year}`;
 
     if((dir===1&&year>=chosenYear)||(dir===-1&&year<=chosenYear)){
+      year=chosenYear;
+      dateText.innerText=`01/01/${year}`;
       stopClock();
+      return;
     }
+
+    dateText.innerText=`01/01/${year}`;
   },40);
 }
 
 function stopClock(){
   clearInterval(clockInterval);
   clockSound.pause();
-  timeOverlay.style.display="none";
   aiText.innerText="Timeline reached.";
+
+  /* KILL CLOCK FOREVER */
+  timeOverlay.style.opacity="0";
+  timeOverlay.style.display="none";
 
   flash.style.opacity="1";
   setTimeout(()=>{
@@ -294,21 +309,8 @@ function stopClock(){
 
 function playArrival(){
   cockpit.style.display="none";
+  aiText.innerText="Arriving in destination timeline.";
   playVideo("videos/arrival.mp4");
-
-  video.onended=()=>{
-    if(chosenPath==="past"){
-      blueFlash.style.opacity="1";
-      setTimeout(()=>{
-        blueFlash.style.opacity="0";
-        show404();
-      },800);
-    }
-  }
-}
-
-function show404(){
-  notFound.style.display="flex";
 }
 </script>
 
