@@ -104,7 +104,7 @@
 
   <!-- VIDEO STAGE -->
   <div id="videoStage">
-    <video id="sceneVideo" autoplay muted playsinline></video>
+    <video id="sceneVideo" playsinline></video>
   </div>
 
   <!-- COCKPIT -->
@@ -125,10 +125,15 @@
   </div>
 
   <div id="yearBtns" style="display:none;">
+  <div id="pastYears" style="display:none;">
     <button onclick="selectYear(1897)">1897</button>
     <button onclick="selectYear(1987)">1987</button>
+  </div>
+
+  <div id="futureYears" style="display:none;">
     <button onclick="selectYear(2050)">2050</button>
     <button onclick="selectYear(3079)">3079</button>
+  </div>
   </div>
 
   <div id="goBtn" style="display:none;">
@@ -159,15 +164,21 @@ let chosenYear = null;
 
 function selectPath(type) {
   chosenPath = type;
+
   document.getElementById("pathBtns").style.display = "none";
   document.getElementById("yearBtns").style.display = "block";
+
+  document.getElementById("pastYears").style.display =
+    type === "past" ? "block" : "none";
+
+  document.getElementById("futureYears").style.display =
+    type === "future" ? "block" : "none";
 
   aiText.innerText =
     type === "future"
       ? "Future selected. Choose a destination year."
       : "Past selected. Choose a destination year.";
 }
-
 function selectYear(year) {
   chosenYear = year;
   document.getElementById("yearBtns").style.display = "none";
