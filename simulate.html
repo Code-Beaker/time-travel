@@ -1,339 +1,204 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Time Simulation</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<title>Time Simulation</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:black;overflow:hidden;font-family:Arial;color:white}
 
-    body {
-      background: black;
-      overflow: hidden;
-      font-family: Arial, sans-serif;
-      color: white;
-    }
+/* ROTATE */
+#rotate{
+  position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  background:black;z-index:9999
+}
 
-    /* ROTATE GATE */
-    #rotate {
-      position: fixed;
-      inset: 0;
-      background: black;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      z-index: 9999;
-    }
+/* VIDEO */
+#videoStage{position:fixed;inset:0;z-index:1}
+video{width:100vw;height:100vh;object-fit:cover}
 
-    /* VIDEO */
-    #videoStage {
-      position: fixed;
-      inset: 0;
-      z-index: 1;
-    }
+/* COCKPIT */
+#cockpit{position:fixed;inset:0;z-index:3;pointer-events:none}
+#cockpit img{width:100%;height:100%;object-fit:cover}
 
-    video {
-      width: 100vw;
-      height: 100vh;
-      object-fit: cover;
-    }
+/* AI */
+#ai{position:fixed;bottom:20px;left:20px;z-index:4;max-width:60%}
 
-    /* COCKPIT */
-    #cockpit {
-      position: fixed;
-      inset: 0;
-      z-index: 3;
-      pointer-events: none;
-      display: block;
-    }
+/* CONTROLS */
+#controls{position:fixed;bottom:20px;right:20px;z-index:4}
+button{
+  background:rgba(0,242,255,.2);
+  border:1px solid #00f2ff;color:#00f2ff;
+  padding:12px 18px;font-weight:bold;cursor:pointer;
+}
+button:hover{background:#00f2ff;color:black}
 
-    #cockpit img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
+/* TIME OVERLAY */
+#timeOverlay{
+  position:fixed;inset:0;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  background:rgba(0,0,0,.4);
+  opacity:0;transition:opacity 1.5s ease;
+  z-index:5;pointer-events:none
+}
 
-    /* AI TEXT */
-    #ai {
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      max-width: 60%;
-      font-size: 14px;
-      opacity: 0.85;
-      z-index: 4;
-    }
+#clock{
+  width:220px;height:220px;border:2px solid white;
+  border-radius:50%;position:relative
+}
 
-    /* CONTROLS */
-    #controls {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      z-index: 4;
-    }
+.hand{position:absolute;top:50%;left:50%;transform-origin:0% 50%;background:white}
+.hour{width:35%;height:4px}
+.minute{width:50%;height:3px}
+.second{width:55%;height:2px;background:red}
 
-    button {
-      background: rgba(0, 242, 255, 0.15);
-      border: 1px solid #00f2ff;
-      color: #00f2ff;
-      padding: 12px 18px;
-      margin-left: 10px;
-      cursor: pointer;
-      font-weight: bold;
-      letter-spacing: 1px;
-      transition: all 0.25s ease;
-    }
+.center-dot{
+  width:8px;height:8px;background:white;border-radius:50%;
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)
+}
 
-    button:hover {
-      background: #00f2ff;
-      color: black;
-      box-shadow: 0 0 20px rgba(0,242,255,0.8);
-    }
+#dateText{
+  margin-top:20px;
+  font-size:26px;
+  letter-spacing:3px;
+}
 
-    button:active {
-      transform: scale(0.95);
-    }
-
-    /* TIME OVERLAY */
-    #timeOverlay {
-      position: fixed;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0,0,0,0.35);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 2s ease;
-      z-index: 5;
-    }
-
-    #clock {
-      position: relative;
-      width: 200px;
-      height: 200px;
-      border: 2px solid rgba(255,255,255,0.7);
-      border-radius: 50%;
-    }
-
-    .hand {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform-origin: 0% 50%;
-      background: white;
-    }
-
-    .hour { width: 40%; height: 4px; }
-    .minute { width: 50%; height: 3px; }
-    .second { width: 55%; height: 2px; background: red; }
-
-    .center-dot {
-      position: absolute;
-      width: 8px;
-      height: 8px;
-      background: white;
-      border-radius: 50%;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-    }
-
-    #dateText {
-      margin-top: 25px;
-      font-size: 18px;
-      letter-spacing: 2px;
-      opacity: 0.5;
-      filter: blur(4px);
-      transition: all 2s ease;
-    }
-
-    @media (orientation: landscape) {
-      #rotate { display: none; }
-    }
-  </style>
+@media(orientation:landscape){#rotate{display:none}}
+</style>
 </head>
 
 <body>
 
-  <!-- ROTATE -->
-  <div id="rotate">
-    <h2>Rotate your device to begin</h2>
-  </div>
+<div id="rotate"><h2>Rotate your device</h2></div>
 
-  <!-- VIDEO -->
-  <div id="videoStage">
-    <video id="sceneVideo" playsinline muted preload="auto"></video>
-  </div>
+<div id="videoStage">
+  <video id="sceneVideo" playsinline muted preload="auto"></video>
+</div>
 
-  <!-- COCKPIT -->
-  <div id="cockpit">
-    <img id="cockpitImg" src="images/cockpit_ground.png" />
-  </div>
+<div id="cockpit">
+  <img id="cockpitImg" src="images/cockpit_ground.png">
+</div>
 
-  <!-- AI -->
-  <div id="ai">
-    <p id="aiText">System online. Location: Earth.</p>
-  </div>
+<div id="ai"><p id="aiText">System online.</p></div>
 
-  <!-- CONTROLS -->
-  <div id="controls">
-    <div id="pathBtns">
-      <button onclick="selectPath('past')">PAST</button>
-      <button onclick="selectPath('future')">FUTURE</button>
+<div id="controls">
+  <div id="pathBtns">
+    <button onclick="selectPath('past')">PAST</button>
+    <button onclick="selectPath('future')">FUTURE</button>
+  </div>
+  <div id="yearBtns" style="display:none">
+    <div id="pastYears">
+      <button onclick="selectYear(1897)">1897</button>
+      <button onclick="selectYear(1987)">1987</button>
     </div>
-
-    <div id="yearBtns" style="display:none;">
-      <div id="pastYears" style="display:none;">
-        <button onclick="selectYear(1897)">1897</button>
-        <button onclick="selectYear(1987)">1987</button>
-      </div>
-      <div id="futureYears" style="display:none;">
-        <button onclick="selectYear(2050)">2050</button>
-        <button onclick="selectYear(3079)">3079</button>
-      </div>
-    </div>
-
-    <div id="goBtn" style="display:none;">
-      <button onclick="goBack()">← BACK</button>
-      <button onclick="takeOff()">TAKE OFF 🚀</button>
+    <div id="futureYears" style="display:none">
+      <button onclick="selectYear(2050)">2050</button>
+      <button onclick="selectYear(3079)">3079</button>
     </div>
   </div>
-
-  <!-- TIME OVERLAY -->
-  <div id="timeOverlay">
-    <div id="clock">
-      <div class="hand hour"></div>
-      <div class="hand minute"></div>
-      <div class="hand second"></div>
-      <div class="center-dot"></div>
-    </div>
-    <div id="dateText">YEAR: ----</div>
+  <div id="goBtn" style="display:none">
+    <button onclick="goBack()">← BACK</button>
+    <button onclick="takeOff()">TAKE OFF 🚀</button>
   </div>
+</div>
 
-  <!-- CLOCK SOUND -->
-  <audio id="clockSound" src="audio/clock.mp3" preload="auto"></audio>
+<div id="timeOverlay">
+  <div id="clock">
+    <div class="hand hour"></div>
+    <div class="hand minute"></div>
+    <div class="hand second"></div>
+    <div class="center-dot"></div>
+  </div>
+  <div id="dateText">YEAR</div>
+</div>
 
-  <script>
-    const video = document.getElementById("sceneVideo");
-    const cockpit = document.getElementById("cockpit");
-    const cockpitImg = document.getElementById("cockpitImg");
-    const aiText = document.getElementById("aiText");
-    const clockSound = document.getElementById("clockSound");
+<audio id="clockSound" src="audio/clock.mp3" preload="auto"></audio>
 
-    const timeOverlay = document.getElementById("timeOverlay");
-    const hourHand = document.querySelector(".hour");
-    const minuteHand = document.querySelector(".minute");
-    const secondHand = document.querySelector(".second");
-    const dateText = document.getElementById("dateText");
+<script>
+const video=document.getElementById("sceneVideo");
+const cockpit=document.getElementById("cockpit");
+const cockpitImg=document.getElementById("cockpitImg");
+const aiText=document.getElementById("aiText");
 
-    clockSound.loop = true;
-    clockSound.volume = 0.5;
+const timeOverlay=document.getElementById("timeOverlay");
+const hourHand=document.querySelector(".hour");
+const minuteHand=document.querySelector(".minute");
+const secondHand=document.querySelector(".second");
+const dateText=document.getElementById("dateText");
 
-    let chosenPath = null;
-    let clockAngle = 0;
-    let clockInterval = null;
+const clockSound=document.getElementById("clockSound");
+clockSound.loop=true;
 
-    function selectPath(type) {
-      chosenPath = type;
-      document.getElementById("pathBtns").style.display = "none";
-      document.getElementById("yearBtns").style.display = "block";
+let chosenPath=null,chosenYear=null;
+let clockInterval=null,yearCounter=0,clockDir=1,angle=0;
 
-      document.getElementById("pastYears").style.display =
-        type === "past" ? "block" : "none";
-      document.getElementById("futureYears").style.display =
-        type === "future" ? "block" : "none";
+function selectPath(p){
+  chosenPath=p;
+  pathBtns.style.display="none";
+  yearBtns.style.display="block";
+  pastYears.style.display=p==="past"?"block":"none";
+  futureYears.style.display=p==="future"?"block":"none";
+}
 
-      aiText.innerText =
-        type === "future"
-          ? "Future selected. Choose a destination year."
-          : "Past selected. Choose a destination year.";
+function selectYear(y){
+  chosenYear=y;
+  yearBtns.style.display="none";
+  goBtn.style.display="block";
+}
+
+function goBack(){
+  goBtn.style.display="none";
+  yearBtns.style.display="block";
+}
+
+function takeOff(){
+  controls.style.display="none";
+  cockpit.style.display="none";
+
+  video.src="videos/launch.mp4";video.play();
+  video.onended=()=>{
+    video.src="videos/fly.mp4";video.play();
+    video.onended=()=>{
+      cockpit.style.display="block";
+      cockpitImg.src="images/cockpit_overlay.png";
+
+      video.src=chosenPath==="future"?"videos/blackhole.mp4":"videos/wormhole.mp4";
+      video.play();
+
+      clockDir=chosenPath==="future"?1:-1;
+      yearCounter=chosenYear;
+
+      setTimeout(startClock,5000);
     }
+  }
+}
 
-    function selectYear(year) {
-      document.getElementById("yearBtns").style.display = "none";
-      document.getElementById("goBtn").style.display = "block";
-      aiText.innerText = "Destination locked: " + year;
-    }
+function startClock(){
+  timeOverlay.style.opacity="1";
+  clockSound.play();
+  dateText.innerText=yearCounter;
 
-    function goBack() {
-      document.getElementById("goBtn").style.display = "none";
-      document.getElementById("yearBtns").style.display = "block";
-      aiText.innerText = "Choose a different destination year.";
-    }
+  clockInterval=setInterval(()=>{
+    angle+=6*clockDir;
+    secondHand.style.transform=`rotate(${angle}deg)`;
+    minuteHand.style.transform=`rotate(${angle/12}deg)`;
+    hourHand.style.transform=`rotate(${angle/144}deg)`;
 
-    function takeOff() {
-      document.getElementById("controls").style.display = "none";
+    yearCounter+=clockDir*3;
+    dateText.innerText=yearCounter;
+  },80);
 
-      cockpit.style.display = "none";
-      video.src = "videos/launch.mp4";
-      video.load();
-      video.muted = true;
-      video.play().catch(() => {});
-      video.onplay = () => video.muted = false;
+  setTimeout(stopClock,15000);
+}
 
-      aiText.innerText = "Engines online. Launching.";
-
-      video.onended = () => {
-        video.src = "videos/fly.mp4";
-        video.load();
-        video.muted = true;
-        video.play().catch(() => {});
-        video.onplay = () => video.muted = false;
-
-        aiText.innerText = "Leaving Earth orbit.";
-
-        video.onended = () => {
-          cockpit.style.display = "block";
-          cockpitImg.src = "images/cockpit_overlay.png";
-
-          if (chosenPath === "future") {
-            video.src = "videos/blackhole.mp4";
-            aiText.innerText = "Approaching black hole. Time dilation extreme.";
-          } else {
-            video.src = "videos/wormhole.mp4";
-            aiText.innerText = "Entering wormhole.";
-          }
-
-          video.load();
-          video.muted = true;
-          video.play().catch(() => {});
-          video.onplay = () => video.muted = false;
-
-          if (chosenPath === "future") {
-            video.onloadedmetadata = () => {
-              const loopStart = Math.max(0, video.duration - 1);
-              video.ontimeupdate = () => {
-                if (video.currentTime >= video.duration - 0.05) {
-                  video.currentTime = loopStart;
-                  video.play().catch(() => {});
-                }
-              };
-            };
-
-            setTimeout(startClock, 3000);
-          }
-        };
-      };
-    }
-
-    function startClock() {
-      timeOverlay.style.opacity = "1";
-      clockSound.play().catch(() => {});
-
-      dateText.innerText = "YEAR: ----";
-
-      clockInterval = setInterval(() => {
-        clockAngle += 0.5;
-        secondHand.style.transform = `rotate(${clockAngle * 6}deg)`;
-        minuteHand.style.transform = `rotate(${clockAngle * 0.5}deg)`;
-        hourHand.style.transform = `rotate(${clockAngle * 0.05}deg)`;
-      }, 100);
-    }
-  </script>
+function stopClock(){
+  clearInterval(clockInterval);
+  clockSound.pause();
+}
+</script>
 
 </body>
 </html>
