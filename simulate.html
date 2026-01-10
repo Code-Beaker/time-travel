@@ -96,6 +96,61 @@
       transform: scale(0.95);
     }
 
+    /* TIME OVERLAY */
+    #timeOverlay {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.35);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 2s ease;
+      z-index: 5;
+    }
+
+    #clock {
+      position: relative;
+      width: 200px;
+      height: 200px;
+      border: 2px solid rgba(255,255,255,0.7);
+      border-radius: 50%;
+    }
+
+    .hand {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform-origin: 0% 50%;
+      background: white;
+    }
+
+    .hour { width: 40%; height: 4px; }
+    .minute { width: 50%; height: 3px; }
+    .second { width: 55%; height: 2px; background: red; }
+
+    .center-dot {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: white;
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    #dateText {
+      margin-top: 25px;
+      font-size: 18px;
+      letter-spacing: 2px;
+      opacity: 0.5;
+      filter: blur(4px);
+      transition: all 2s ease;
+    }
+
     @media (orientation: landscape) {
       #rotate { display: none; }
     }
@@ -148,7 +203,18 @@
     </div>
   </div>
 
-  <!-- CLOCK SOUND (READY, NOT PLAYING YET) -->
+  <!-- TIME OVERLAY -->
+  <div id="timeOverlay">
+    <div id="clock">
+      <div class="hand hour"></div>
+      <div class="hand minute"></div>
+      <div class="hand second"></div>
+      <div class="center-dot"></div>
+    </div>
+    <div id="dateText">YEAR: ----</div>
+  </div>
+
+  <!-- CLOCK SOUND -->
   <audio id="clockSound" src="audio/clock.mp3" preload="auto"></audio>
 
   <script>
@@ -158,10 +224,18 @@
     const aiText = document.getElementById("aiText");
     const clockSound = document.getElementById("clockSound");
 
+    const timeOverlay = document.getElementById("timeOverlay");
+    const hourHand = document.querySelector(".hour");
+    const minuteHand = document.querySelector(".minute");
+    const secondHand = document.querySelector(".second");
+    const dateText = document.getElementById("dateText");
+
     clockSound.loop = true;
     clockSound.volume = 0.5;
 
     let chosenPath = null;
+    let clockAngle = 0;
+    let clockInterval = null;
 
     function selectPath(type) {
       chosenPath = type;
@@ -194,7 +268,6 @@
     function takeOff() {
       document.getElementById("controls").style.display = "none";
 
-      // LAUNCH (outside)
       cockpit.style.display = "none";
       video.src = "videos/launch.mp4";
       video.load();
@@ -205,7 +278,6 @@
       aiText.innerText = "Engines online. Launching.";
 
       video.onended = () => {
-        // FLY (outside)
         video.src = "videos/fly.mp4";
         video.load();
         video.muted = true;
@@ -215,7 +287,6 @@
         aiText.innerText = "Leaving Earth orbit.";
 
         video.onended = () => {
-          // DANGER ZONE (inside)
           cockpit.style.display = "block";
           cockpitImg.src = "images/cockpit_overlay.png";
 
@@ -232,7 +303,6 @@
           video.play().catch(() => {});
           video.onplay = () => video.muted = false;
 
-          // BLACK HOLE LOOP (last 1 second)
           if (chosenPath === "future") {
             video.onloadedmetadata = () => {
               const loopStart = Math.max(0, video.duration - 1);
@@ -243,9 +313,25 @@
                 }
               };
             };
+
+            setTimeout(startClock, 3000);
           }
         };
       };
+    }
+
+    function startClock() {
+      timeOverlay.style.opacity = "1";
+      clockSound.play().catch(() => {});
+
+      dateText.innerText = "YEAR: ----";
+
+      clockInterval = setInterval(() => {
+        clockAngle += 0.5;
+        secondHand.style.transform = `rotate(${clockAngle * 6}deg)`;
+        minuteHand.style.transform = `rotate(${clockAngle * 0.5}deg)`;
+        hourHand.style.transform = `rotate(${clockAngle * 0.05}deg)`;
+      }, 100);
     }
   </script>
 
