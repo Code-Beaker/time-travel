@@ -148,11 +148,18 @@
     </div>
   </div>
 
+  <!-- CLOCK SOUND (READY, NOT PLAYING YET) -->
+  <audio id="clockSound" src="audio/clock.mp3" preload="auto"></audio>
+
   <script>
     const video = document.getElementById("sceneVideo");
     const cockpit = document.getElementById("cockpit");
     const cockpitImg = document.getElementById("cockpitImg");
     const aiText = document.getElementById("aiText");
+    const clockSound = document.getElementById("clockSound");
+
+    clockSound.loop = true;
+    clockSound.volume = 0.5;
 
     let chosenPath = null;
 
@@ -225,12 +232,12 @@
           video.play().catch(() => {});
           video.onplay = () => video.muted = false;
 
-          // BLACK HOLE LOOP (last 2s)
+          // BLACK HOLE LOOP (last 1 second)
           if (chosenPath === "future") {
             video.onloadedmetadata = () => {
               const loopStart = Math.max(0, video.duration - 1);
               video.ontimeupdate = () => {
-                if (video.currentTime >= video.duration - 0.1) {
+                if (video.currentTime >= video.duration - 0.05) {
                   video.currentTime = loopStart;
                   video.play().catch(() => {});
                 }
