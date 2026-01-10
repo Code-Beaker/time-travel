@@ -296,9 +296,14 @@ function stopClock(){
   clockSound.pause();
   aiText.innerText="Timeline reached.";
 
-  flash.style.opacity="1";
+  // HIDE CLOCK + DATE
+  timeOverlay.style.opacity = "0";
+
+  // WHITE FLASH
+  flash.style.opacity = "1";
+
   setTimeout(()=>{
-    flash.style.opacity="0";
+    flash.style.opacity = "0";
     playArrival();
   },2000);
 }
