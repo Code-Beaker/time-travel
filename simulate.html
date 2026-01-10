@@ -1,1 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Time Simulation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: black;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+      color: white;
+    }
+
+    /* ROTATE GATE */
+    #rotate {
+      position: fixed;
+      inset: 0;
+      background: black;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      z-index: 9999;
+    }
+
+    /* VIDEO LAYER */
+    #videoStage {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+    }
+
+    video {
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+    }
+
+    /* COCKPIT OVERLAY */
+    #cockpit {
+      position: fixed;
+      inset: 0;
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    #cockpit img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* AI CONSOLE */
+    #ai {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      max-width: 60%;
+      font-size: 14px;
+      opacity: 0.85;
+      z-index: 4;
+    }
+
+    /* CONTROLS */
+    #controls {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 4;
+    }
+
+    button {
+      background: transparent;
+      border: 1px solid white;
+      color: white;
+      padding: 10px 16px;
+      margin-left: 10px;
+      cursor: pointer;
+    }
+
+    /* LANDSCAPE ONLY */
+    @media (orientation: landscape) {
+      #rotate {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ROTATE SCREEN -->
+  <div id="rotate">
+    <h2>Rotate your device to begin</h2>
+  </div>
+
+  <!-- VIDEO STAGE -->
+  <div id="videoStage">
+    <video id="sceneVideo" autoplay muted playsinline></video>
+  </div>
+
+  <!-- COCKPIT -->
+  <div id="cockpit">
+    <img id="cockpitImg" src="images/cockpit_ground.png" />
+  </div>
+
+  <!-- AI TEXT -->
+  <div id="ai">
+    <p id="aiText">System online. Location: Earth.</p>
+  </div>
+
+  <!-- CONTROLS -->
+  <div id="controls">
+    <button onclick="selectPath('past')">PAST</button>
+    <button onclick="selectPath('future')">FUTURE</button>
+  </div>
+
+  <script>
+    const video = document.getElementById("sceneVideo");
+    const cockpit = document.getElementById("cockpitImg");
+    const aiText = document.getElementById("aiText");
+
+    function selectPath(type) {
+      if (type === "future") {
+        aiText.innerText = "Future selected. Relativistic travel required.";
+        video.src = "videos/launch.mp4";
+        cockpit.src = "images/cockpit_overlay.png";
+      }
+
+      if (type === "past") {
+        aiText.innerText = "Past selected. Wormhole stabilization required.";
+        video.src = "videos/launch.mp4";
+        cockpit.src = "images/cockpit_overlay.png";
+      }
+    }
+  </script>
+
+</body>
+</html>
