@@ -100,7 +100,6 @@ button:hover{background:#00f2ff;color:black}
 <body>
 
 <div id="videoStage"><video id="sceneVideo" playsinline preload="auto"></video></div>
-<div id="cockpit"><img id="cockpitImg" src="images/cockpit_ground.png"></div>
 <div id="ai"><p id="aiText">System online.</p></div>
 
 <div id="controls">
@@ -168,7 +167,6 @@ const goBtn=document.getElementById("goBtn");
 const ai=document.getElementById("ai");
 const aiText=document.getElementById("aiText");
 const controls=document.getElementById("controls");
-const cockpit=document.getElementById("cockpit");
 const cockpitImg=document.getElementById("cockpitImg");
 const timeOverlay=document.getElementById("timeOverlay");
 const hourHand=document.querySelector(".hour");
@@ -221,8 +219,7 @@ function takeOff(){
   video.onended=()=>{
     playVideo("videos/fly.mp4");
     video.onended=()=>{
-      cockpit.style.display="block";
-      cockpitImg.src="images/cockpit_overlay.png";
+  
       playVideo(chosenPath==="future"?"videos/blackhole.mp4":"videos/wormhole.mp4");
       setTimeout(startClock,5000);
     };
@@ -255,7 +252,7 @@ function stopClock(){
 }
 
 function playArrival(){
-  cockpit.style.display="none";
+
   playVideo("videos/arrival.mp4");
   video.onended=()=>{
     if(chosenPath==="past"){
