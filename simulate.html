@@ -115,9 +115,7 @@ button:hover{background:#00f2ff;color:black}
   justify-content:center;
   z-index:30;
 }
-#aiBox{
-  max-width:420px;
-}
+#aiBox{max-width:420px}
 #aiOverrideText{
   font-size:15px;
   line-height:1.6;
@@ -130,6 +128,27 @@ button:hover{background:#00f2ff;color:black}
   font-weight:bold;
   cursor:pointer;
   border-radius:6px;
+}
+
+/* MAGIC OVERLAY */
+#magicOverlay{
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(circle at center,
+      rgba(120,0,255,.45),
+      rgba(0,242,255,.35),
+      rgba(20,20,60,.95)
+    );
+  opacity:0;
+  pointer-events:none;
+  z-index:40;
+  backdrop-filter: blur(0px);
+  transition: opacity .4s ease, backdrop-filter .6s ease;
+}
+#magicOverlay.active{
+  opacity:1;
+  backdrop-filter: blur(14px);
 }
 </style>
 </head>
@@ -194,6 +213,8 @@ button:hover{background:#00f2ff;color:black}
   </div>
 </div>
 
+<div id="magicOverlay"></div>
+
 <audio id="clockSound" src="audio/clock.mp3" preload="auto"></audio>
 
 <script>
@@ -215,6 +236,8 @@ const notFound=document.getElementById("notFound");
 
 const aiOverride=document.getElementById("aiOverride");
 const aiOverrideText=document.getElementById("aiOverrideText");
+const magicOverlay=document.getElementById("magicOverlay");
+const magicBtn=document.getElementById("magicBtn");
 
 const clockSound=document.getElementById("clockSound");
 clockSound.loop=true;
@@ -358,6 +381,22 @@ The internet does not exist in this timeline.
 That page cannot exist here.
 But I can try something else.`;
 }
+
+/* MAGIC ACTION */
+magicBtn.onclick=()=>{
+  magicOverlay.classList.add("active");
+
+  setTimeout(()=>{
+    magicOverlay.style.background=
+      "linear-gradient(135deg,#6a00ff,#00f2ff,#ffd700)";
+  },300);
+
+  setTimeout(()=>{
+    magicOverlay.classList.remove("active");
+    magicOverlay.style.opacity="0";
+    aiOverride.style.display="none";
+  },1400);
+};
 </script>
 
 </body>
