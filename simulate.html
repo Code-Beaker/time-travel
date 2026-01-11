@@ -5,7 +5,10 @@
 <title>Time Simulation</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-  /* RETRO PAGE CONTAINER */
+  /* RETRO PAGE CONTAINER (SCROLL FIXED)
+     - Allows scrolling if content is too tall
+     - Content starts from top (flex-start)
+  */
   #retroPage{
     position:fixed;
     inset:0;
@@ -14,21 +17,24 @@
     display:none; /* Becomes flex via JS */
     flex-direction: column;
     align-items:center;
-    justify-content:center;
+    justify-content: flex-start; /* Start from top */
+    padding-top: 50px;
+    padding-bottom: 80px; /* Extra space at bottom for button */
+    overflow-y: auto;    /* 🔥 ENABLE SCROLLING */
     font-size:32px;
     font-weight:bold;
     letter-spacing:2px;
     z-index:50;
-    transition: background-color 3s ease; /* Smooth BG transition */
+    transition: background-color 3s ease;
   }
 
-  /* TITLE */
+  /* TITLE (SCROLL FIXED) */
   #retroTitleWrap{
-    position:fixed;
-    top:40px;
+    position:relative; /* Changed from fixed so it scrolls */
     width:100%;
     text-align:center;
     z-index:60;
+    margin-bottom: 20px;
   }
 
   #retroTitle{
@@ -43,7 +49,8 @@
   #retroClockWrap{
     opacity:0;
     transition:opacity 2s ease;
-    margin-top: 50px;
+    margin-top: 20px;
+    flex-shrink: 0; /* Prevents clock from squishing */
   }
 
   /* CLOCK FACE (ANALOG) */
@@ -59,7 +66,7 @@
 
   /* FUTURE CLOCK (DIGITAL) */
   #futureClock{
-    display: none; /* Hidden by default */
+    display: none;
     font-family: 'Courier New', monospace;
     font-size: 60px;
     color: #00f2ff;
@@ -122,13 +129,15 @@
   /* RETRO IMAGE */
   #retroImage{
     width:320px;
+    max-width: 90%;
     margin-top:30px;
     opacity:0;
     transition:opacity 2s ease;
     filter: sepia(0.8);
+    flex-shrink: 0;
   }
 
-  /* PART A: DESCRIPTION TEXT */
+  /* DESCRIPTION TEXT */
   #descContainer {
     margin-top: 25px;
     text-align: center;
@@ -142,7 +151,7 @@
     line-height: 1.5;
     margin-bottom: 12px;
     opacity: 0;
-    transform: translateY(15px); /* Start slightly lower */
+    transform: translateY(15px);
     transition: opacity 1s ease, transform 1s ease;
   }
   .desc-line.visible {
@@ -150,9 +159,9 @@
     transform: translateY(0);
   }
 
-  /* PART C: ACTION BUTTON */
+  /* ACTION BUTTON */
   #actionBtn {
-    margin-top: 20px;
+    margin-top: 30px;
     background: transparent;
     border: 2px solid white;
     color: white;
@@ -161,8 +170,9 @@
     font-family: Arial, sans-serif;
     cursor: pointer;
     border-radius: 30px;
-    opacity: 0; /* Starts hidden */
+    opacity: 0;
     transition: opacity 2s ease, box-shadow 0.3s ease, background 0.3s ease;
+    flex-shrink: 0;
   }
   #actionBtn:hover {
     box-shadow: 0 0 15px white;
@@ -569,8 +579,16 @@ function playArrival(){
   playVideo("videos/arrival.mp4");
 
   video.onended=()=>{
-    // PART E: FUTURE PATH DIFFERENCE
-    if(chosenPath==="past"){
+    // FUTURE: SKIP 404, FLASH BLUE, GO DIRECTLY
+    if(chosenPath==="future"){
+      flashBlue.style.opacity="1";
+      setTimeout(()=>{
+        flashBlue.style.opacity="0";
+        startFutureSequence();
+      }, 2000);
+    } 
+    else {
+      // PAST: 404 AND MAGIC OVERRIDE
       flashBlue.style.opacity="1";
       setTimeout(()=>{
         flashBlue.style.opacity="0";
@@ -582,14 +600,6 @@ function playArrival(){
         },2000);
 
       },800);
-    } 
-    else {
-      // FUTURE: SKIP 404, FLASH BLUE, GO DIRECTLY
-      flashBlue.style.opacity="1";
-      setTimeout(()=>{
-        flashBlue.style.opacity="0";
-        startFutureSequence();
-      }, 2000);
     }
   }
 }
@@ -625,7 +635,6 @@ magicBtn.onclick = () => {
 
 // Start Future Sequence directly (skips Magic Click)
 function startFutureSequence(){
-  // Hide previous layers
   document.body.style.background = "black";
   timeOverlay.style.display = "none";
   video.style.display = "none";
@@ -635,11 +644,9 @@ function startFutureSequence(){
   const retro = document.getElementById("retroPage");
   retro.style.display = "flex";
   
-  // Future color for typing
   typeTitle(`WELCOME TO ${chosenYear}`, chosenYear, fadeInRetroClock);
 }
 
-// Pendulum Animation Logic for 1897
 function startPendulumClock(){
   const pendulum = document.getElementById("retroPendulum");
   const secondHand = document.querySelector(".retroSecond");
@@ -655,17 +662,14 @@ function startPendulumClock(){
   }, 30);
 }
 
-// Digital Clock Logic for Future
 function startFutureClock(){
   const fc = document.getElementById("futureClock");
   const ac = document.getElementById("retroClockFace");
   ac.style.display = "none";
   fc.style.display = "block";
 
-  // Simulate a futuristic time
   setInterval(()=>{
     const d = new Date();
-    // Just random futuristic randomness added to seconds to look cool
     const ms = Math.floor(Math.random() * 99);
     fc.innerText = d.toTimeString().split(' ')[0] + ":" + ms;
   }, 100);
@@ -683,10 +687,9 @@ function fadeInRetroClock(){
     startPendulumClock();
   } else if(chosenYear === 1987){
     img.src = "images/past_1987.jpg";
-    // Normal ticking starts below
   } else {
     // Future
-    img.src = "images/future_city.jpg"; // You'll need this image or it breaks
+    img.src = "images/future_city.jpg";
     startFutureClock(); 
   }
 
@@ -694,7 +697,7 @@ function fadeInRetroClock(){
   setTimeout(()=>{
     img.style.opacity = 1;
     
-    // 🟢 START NEW SEQUENCE AFTER IMAGE FADES
+    // 🟢 START DESCRIPTION SEQUENCE AFTER IMAGE FADES
     setTimeout(showDescriptionSequence, 1500);
 
   },1500);
@@ -718,13 +721,9 @@ function fadeInRetroClock(){
   },1000);
 }
 
-// ----------------------------------------------------
-// NEW CODE FOR DESCRIPTION, BACKGROUND, AND ACTION BTN
-// ----------------------------------------------------
-
 function showDescriptionSequence() {
   const container = document.getElementById("descContainer");
-  container.innerHTML = ""; // Clear existing
+  container.innerHTML = ""; 
 
   let lines = [];
 
@@ -749,22 +748,19 @@ function showDescriptionSequence() {
     ];
   }
 
-  // Create P tags hidden
   lines.forEach((txt, index) => {
     const p = document.createElement("p");
     p.innerText = txt;
     p.className = "desc-line";
     container.appendChild(p);
 
-    // Staggered Fade In
     setTimeout(() => {
       p.classList.add("visible");
       
-      // If this is the last line, trigger background change
       if(index === lines.length - 1) {
         setTimeout(changeBackground, 1500);
       }
-    }, index * 1200); // 1.2s delay between lines
+    }, index * 1200); 
   });
 }
 
@@ -772,14 +768,13 @@ function changeBackground() {
   const retroPage = document.getElementById("retroPage");
   
   if(chosenYear === 1897) {
-    retroPage.style.background = "#2a2215"; // Sepia / Parchment
+    retroPage.style.background = "#2a2215"; 
   } else if(chosenYear === 1987) {
-    retroPage.style.background = "#001a0f"; // Dark Green / CRT
+    retroPage.style.background = "#001a0f"; 
   } else {
-    retroPage.style.background = "#02001c"; // Deep Neon Blue
+    retroPage.style.background = "#02001c"; 
   }
 
-  // After BG transition starts, show button
   setTimeout(showActionBtn, 2500);
 }
 
@@ -789,8 +784,8 @@ function showActionBtn() {
 }
 
 function goToExplainPage() {
-  // Navigate to new page with year
   window.location.href = `explain.html?year=${chosenYear}`;
 }
 </script>
 </body>
+</html>
