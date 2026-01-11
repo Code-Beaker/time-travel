@@ -269,11 +269,16 @@ typeSound.volume = 0.3; // softer sound
 
   let i = 0;
   const interval = setInterval(()=>{
-    title.innerHTML += text[i];
-    playTypeSound();
-    i++;
-    if(i >= text.length) clearInterval(interval);
-  }, 90);
+  title.innerHTML += text[i];
+  playTypeSound(); // 🔊 typing sound
+  i++;
+
+  if(i >= text.length){
+    clearInterval(interval);
+    typeSound.pause();       // 🛑 stop sound
+    typeSound.currentTime = 0;
+  }
+}, 90);
   }
 const video=document.getElementById("sceneVideo");
 const cockpit=document.getElementById("cockpit");
