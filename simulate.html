@@ -150,6 +150,20 @@ button:hover{background:#00f2ff;color:black}
   opacity:1;
   backdrop-filter: blur(14px);
 }
+  /* RETRO PAGE */
+#retroPage{
+  position:fixed;
+  inset:0;
+  background:black;
+  color:white;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  font-size:32px;
+  font-weight:bold;
+  letter-spacing:2px;
+  z-index:50;
+}
 </style>
 </head>
 
@@ -214,6 +228,7 @@ button:hover{background:#00f2ff;color:black}
 </div>
 
 <div id="magicOverlay"></div>
+  <div id="retroPage"></div>
 
 <audio id="clockSound" src="audio/clock.mp3" preload="auto"></audio>
 
@@ -383,19 +398,31 @@ But I can try something else.`;
 }
 
 /* MAGIC ACTION */
-magicBtn.onclick=()=>{
+magicBtn.onclick = () => {
+
+  // 1️⃣ Magic colors
   magicOverlay.classList.add("active");
 
   setTimeout(()=>{
-    magicOverlay.style.background=
+    magicOverlay.style.background =
       "linear-gradient(135deg,#6a00ff,#00f2ff,#ffd700)";
   },300);
 
+  // 2️⃣ Hard cut to void (black screen)
   setTimeout(()=>{
     magicOverlay.classList.remove("active");
-    magicOverlay.style.opacity="0";
-    aiOverride.style.display="none";
+    aiOverride.style.display = "none";
+
+    document.body.style.background = "black";
   },1400);
+
+  // 3️⃣ Show retro page
+  setTimeout(()=>{
+    const retro = document.getElementById("retroPage");
+    retro.style.display = "flex";
+    retro.innerText = `WELCOME TO ${chosenYear}`;
+  },2400);
+
 };
 </script>
 
