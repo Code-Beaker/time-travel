@@ -270,6 +270,7 @@ typeSound.volume = 0.3; // softer sound
   let i = 0;
   const interval = setInterval(()=>{
     title.innerHTML += text[i];
+    playTypeSound();
     i++;
     if(i >= text.length) clearInterval(interval);
   }, 90);
