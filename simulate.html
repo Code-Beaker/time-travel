@@ -488,10 +488,6 @@ But I can try something else.`;
 }
 
 /* MAGIC ACTION */
-  function fadeInRetroClock(){
-  const clockWrap = document.getElementById("retroClockWrap");
-  clockWrap.style.opacity = "1";
-  }
 magicBtn.onclick = () => {
 
   // 1️⃣ Magic colors
@@ -515,53 +511,37 @@ magicBtn.onclick = () => {
     const retro = document.getElementById("retroPage");
     retro.style.display = "flex";
     typeTitle(`WELCOME TO ${chosenYear}`, chosenYear);
-    
 
-setTimeout(()=>{
+    if(i >= text.length){
+  clearInterval(interval);
+  typeSound.pause();
+  typeSound.currentTime = 0;
+
+  // ✅ START CLOCK AFTER TYPING FINISHES
   fadeInRetroClock();
-}, 1200);
+    }
+
   },2400);
-
 };
-  function showRetroClock(){
-  const clock = document.getElementById("clock");
 
-  // reset + show clock
-  clock.style.opacity = 0;
-  clock.style.transition = "opacity 2s ease";
-  clock.style.display = "block";
+function fadeInRetroClock(){
+  const wrap = document.getElementById("retroClockWrap");
 
-  setTimeout(()=>{
-    clock.style.opacity = 1;
-    startRetroClock();
-  }, 500);
-}
+  // fade in clock
+  wrap.style.opacity = 1;
 
-function startRetroClock(){
+  const h = document.querySelector(".retroHour");
+  const m = document.querySelector(".retroMinute");
+  const s = document.querySelector(".retroSecond");
+
   let sec = 0;
   setInterval(()=>{
     sec += 6;
-    secondHand.style.transform = `rotate(${sec}deg)`;
-    minuteHand.style.transform = `rotate(${sec/60}deg)`;
-    hourHand.style.transform = `rotate(${sec/720}deg)`;
-  }, 1000);
-}
-  function startRetroClock(){
-  const rc = document.getElementById("retroClock");
-  rc.classList.add("active");
-
-  let h = 10, m = 0, s = 0;
-
-  setInterval(()=>{
-    s++;
-    if(s===60){s=0;m++}
-    if(m===60){m=0;h++}
-    if(h===24)h=0;
-
-    rc.innerText =
-      `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+    s.style.transform = `rotate(${sec}deg)`;
+    m.style.transform = `rotate(${sec/60}deg)`;
+    h.style.transform = `rotate(${sec/720}deg)`;
   },1000);
-  }
+}
 </script>
 <div id="retroTitleWrap">
   <div id="retroTitle"></div>
@@ -575,4 +555,5 @@ function startRetroClock(){
   </div>
   </div>
 </body>
-</html>
+      </html>
+      
