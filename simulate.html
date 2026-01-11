@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <title>Time Simulation</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
   #retroTitleWrap{
   position:fixed;
@@ -224,26 +223,20 @@ button:hover{background:#00f2ff;color:black}
 }
 </style>
 </head>
-
 <body>
-
 <div id="videoStage">
   <video id="sceneVideo" playsinline preload="auto"></video>
 </div>
-
 <div id="cockpit">
   <img id="cockpitImg" src="images/cockpit_ground.png">
 </div>
-
 <div id="ai"><p id="aiText">System online.</p></div>
-
 <div id="controls">
   <div id="pathBtns">
     <button onclick="selectPath('past')">PAST</button>
     <button onclick="selectPath('future')">FUTURE</button>
   </div>
-
-  <div id="yearBtns" style="display:none">
+    <div id="yearBtns" style="display:none">
     <div id="pastYears">
       <button onclick="selectYear(1897)">1897</button>
       <button onclick="selectYear(1987)">1987</button>
@@ -253,13 +246,11 @@ button:hover{background:#00f2ff;color:black}
       <button onclick="selectYear(3079)">3079</button>
     </div>
   </div>
-
-  <div id="goBtn" style="display:none">
+    <div id="goBtn" style="display:none">
     <button onclick="goBack()">← BACK</button>
     <button onclick="takeOff()">TAKE OFF 🚀</button>
   </div>
 </div>
-
 <div id="timeOverlay">
   <div id="clock">
     <div class="hand hour"></div>
@@ -269,37 +260,49 @@ button:hover{background:#00f2ff;color:black}
   </div>
   <div id="dateText"></div>
 </div>
-
 <div id="flashWhite"></div>
 <div id="flashBlue"></div>
-
 <div id="notFound">
   <h1>404</h1>
   <p>Page not found</p>
 </div>
-
 <div id="aiOverride">
   <div id="aiBox">
     <p id="aiOverrideText"></p>
     <button id="magicBtn">MAGIC 🪄</button>
   </div>
 </div>
-
 <div id="magicOverlay"></div>
-  <div id="retroPage"></div>
+<div id="retroPage"></div>
+
+<div id="retroTitleWrap">
+  <div id="retroTitle"></div>
+</div>
+
+<div id="retroClockWrap">
+  <div id="retroClockFace">
+    <div class="retroHand retroHour"></div>
+    <div class="retroHand retroMinute"></div>
+    <div class="retroHand retroSecond"></div>
+    <div class="retroCenter"></div>
+  </div>
+</div>
 
 <audio id="clockSound" src="audio/clock.mp3" preload="auto"></audio>
-  <audio id="typeSound" src="audio/type.mp3" preload="auto"></audio>
+<audio id="typeSound" src="audio/type.mp3" preload="auto"></audio>
 
 <script>
-  const typeSound = document.getElementById("typeSound");
+const typeSound = document.getElementById("typeSound");
 typeSound.volume = 0.3; // softer sound
-  function playTypeSound(){
+
+function playTypeSound(){
   typeSound.pause();
   typeSound.currentTime = 0;
   typeSound.play().catch(()=>{});
-  }
-  function typeTitle(text, year){
+}
+
+// MODIFIED: Added 'callback' parameter to run code after typing finishes
+function typeTitle(text, year, callback){
   const title = document.getElementById("retroTitle");
   title.innerHTML = "";
   title.style.opacity = 1;
@@ -312,17 +315,21 @@ typeSound.volume = 0.3; // softer sound
 
   let i = 0;
   const interval = setInterval(()=>{
-  title.innerHTML += text[i];
-  playTypeSound(); // 🔊 typing sound
-  i++;
+    title.innerHTML += text[i];
+    playTypeSound(); // 🔊 typing sound
+    i++;
 
-  if(i >= text.length){
-    clearInterval(interval);
-    typeSound.pause();       // 🛑 stop sound
-    typeSound.currentTime = 0;
-  }
-}, 90);
-  }
+    if(i >= text.length){
+      clearInterval(interval);
+      typeSound.pause();       // 🛑 stop sound
+      typeSound.currentTime = 0;
+
+      // Execute the callback function if it exists
+      if(callback) callback();
+    }
+  }, 90);
+}
+
 const video=document.getElementById("sceneVideo");
 const cockpit=document.getElementById("cockpit");
 const cockpitImg=document.getElementById("cockpitImg");
@@ -510,16 +517,9 @@ magicBtn.onclick = () => {
   setTimeout(()=>{
     const retro = document.getElementById("retroPage");
     retro.style.display = "flex";
-    typeTitle(`WELCOME TO ${chosenYear}`, chosenYear);
 
-    if(i >= text.length){
-  clearInterval(interval);
-  typeSound.pause();
-  typeSound.currentTime = 0;
-
-  // ✅ START CLOCK AFTER TYPING FINISHES
-  fadeInRetroClock();
-    }
+    // MODIFIED: Pass 'fadeInRetroClock' as the callback function
+    typeTitle(`WELCOME TO ${chosenYear}`, chosenYear, fadeInRetroClock);
 
   },2400);
 };
@@ -543,17 +543,5 @@ function fadeInRetroClock(){
   },1000);
 }
 </script>
-<div id="retroTitleWrap">
-  <div id="retroTitle"></div>
-</div>
-  <div id="retroClockWrap">
-  <div id="retroClockFace">
-    <div class="retroHand retroHour"></div>
-    <div class="retroHand retroMinute"></div>
-    <div class="retroHand retroSecond"></div>
-    <div class="retroCenter"></div>
-  </div>
-  </div>
 </body>
-      </html>
-      
+</html>
