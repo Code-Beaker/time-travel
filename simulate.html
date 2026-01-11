@@ -488,6 +488,10 @@ But I can try something else.`;
 }
 
 /* MAGIC ACTION */
+  function fadeInRetroClock(){
+  const clockWrap = document.getElementById("retroClockWrap");
+  clockWrap.style.opacity = "1";
+  }
 magicBtn.onclick = () => {
 
   // 1️⃣ Magic colors
@@ -511,7 +515,11 @@ magicBtn.onclick = () => {
     const retro = document.getElementById("retroPage");
     retro.style.display = "flex";
     typeTitle(`WELCOME TO ${chosenYear}`, chosenYear);
-    startRetroClock();
+    typeTitle(`WELCOME TO ${chosenYear}`, chosenYear);
+
+setTimeout(()=>{
+  fadeInRetroClock();
+}, 1200);
   },2400);
 
 };
