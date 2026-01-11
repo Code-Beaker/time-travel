@@ -6,6 +6,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
+  #retroTitleWrap{
+  position:fixed;
+  top:40px;
+  width:100%;
+  text-align:center;
+  z-index:60;
+}
+
+#retroTitle{
+  font-size:42px;
+  letter-spacing:4px;
+  font-family:Courier, monospace;
+  opacity:0;
+  transition:color 1s ease;
+}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:black;overflow:hidden;font-family:Arial;color:white}
 
@@ -233,6 +248,24 @@ button:hover{background:#00f2ff;color:black}
 <audio id="clockSound" src="audio/clock.mp3" preload="auto"></audio>
 
 <script>
+  function typeTitle(text, year){
+  const title = document.getElementById("retroTitle");
+  title.innerHTML = "";
+  title.style.opacity = 1;
+
+  // timeline colors
+  if(year < 1900) title.style.color = "#cfa66a";      // sepia
+  else if(year < 2000) title.style.color = "#00ff88"; // CRT green
+  else if(year < 3000) title.style.color = "#00f2ff"; // neon
+  else title.style.color = "#b36bff";                 // cosmic
+
+  let i = 0;
+  const interval = setInterval(()=>{
+    title.innerHTML += text[i];
+    i++;
+    if(i >= text.length) clearInterval(interval);
+  }, 90);
+  }
 const video=document.getElementById("sceneVideo");
 const cockpit=document.getElementById("cockpit");
 const cockpitImg=document.getElementById("cockpitImg");
@@ -420,11 +453,13 @@ magicBtn.onclick = () => {
   setTimeout(()=>{
     const retro = document.getElementById("retroPage");
     retro.style.display = "flex";
-    retro.innerText = `WELCOME TO ${chosenYear}`;
+    typeTitle(`WELCOME TO ${chosenYear}`, chosenYear);
   },2400);
 
 };
 </script>
-
+<div id="retroTitleWrap">
+  <div id="retroTitle"></div>
+</div>
 </body>
 </html>
