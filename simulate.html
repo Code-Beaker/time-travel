@@ -5,224 +5,223 @@
 <title>Time Simulation</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
+  /* RETRO PAGE CONTAINER */
+  #retroPage{
+    position:fixed;
+    inset:0;
+    background:black;
+    color:white;
+    display:none; /* Becomes flex via JS */
+    flex-direction: column;
+    align-items:center;
+    justify-content:center;
+    font-size:32px;
+    font-weight:bold;
+    letter-spacing:2px;
+    z-index:50;
+  }
+
+  /* TITLE */
   #retroTitleWrap{
-  position:fixed;
-  top:40px;
-  width:100%;
-  text-align:center;
-  z-index:60;
-}
+    position:fixed;
+    top:40px;
+    width:100%;
+    text-align:center;
+    z-index:60;
+  }
 
-#retroTitle{
-  font-size:42px;
-  letter-spacing:4px;
-  font-family:Courier, monospace;
-  opacity:0;
-  transition:color 1s ease;
-}
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:black;overflow:hidden;font-family:Arial;color:white}
+  #retroTitle{
+    font-size:42px;
+    letter-spacing:4px;
+    font-family:Courier, monospace;
+    opacity:0;
+    transition:color 1s ease;
+  }
 
-/* VIDEO */
-#videoStage{position:fixed;inset:0;z-index:1}
-video{width:100vw;height:100vh;object-fit:cover}
-
-/* COCKPIT */
-#cockpit{position:fixed;inset:0;z-index:3;pointer-events:none}
-#cockpit img{width:100%;height:100%;object-fit:cover}
-
-/* AI */
-#ai{
-  position:fixed;
-  bottom:20px;
-  left:20px;
-  z-index:4;
-  max-width:65%;
-  font-size:14px;
-  opacity:.9;
-}
-
-/* CONTROLS */
-#controls{position:fixed;bottom:20px;right:20px;z-index:4}
-button{
-  background:rgba(0,242,255,.25);
-  border:1px solid #00f2ff;
-  color:#00f2ff;
-  padding:12px 18px;
-  font-weight:bold;
-  cursor:pointer;
-}
-button:hover{background:#00f2ff;color:black}
-
-/* TIME OVERLAY */
-#timeOverlay{
-  position:fixed;
-  inset:0;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  background:rgba(0,0,0,.45);
-  opacity:0;
-  transition:opacity 1.5s ease;
-  z-index:5;
-  pointer-events:none;
-}
-
-/* CLOCK */
-#clock{
-  width:240px;height:240px;
-  border:2px solid white;
-  border-radius:50%;
-  position:relative;
-}
-.number{position:absolute;transform:translate(-50%,-50%);font-size:14px}
-.hand{
-  position:absolute;
-  top:50%;left:50%;
-  transform-origin:0% 50%;
-  transform:translateY(-50%);
-  background:white;
-}
-.hour{width:35%;height:4px}
-.minute{width:50%;height:3px}
-.second{width:50%;height:2px;background:red}
-.center-dot{
-  width:8px;height:8px;background:white;border-radius:50%;
-  position:absolute;top:50%;left:50%;
-  transform:translate(-50%,-50%);
-}
-#dateText{margin-top:20px;font-size:24px;letter-spacing:2px}
-
-/* FLASHES */
-#flashWhite,#flashBlue{
-  position:fixed;inset:0;
-  opacity:0;
-  z-index:10;
-  pointer-events:none;
-  transition:opacity .4s ease;
-}
-#flashWhite{background:white}
-#flashBlue{background:#0b1c2d}
-
-/* 404 */
-#notFound{
-  position:fixed;inset:0;
-  background:#111;
-  color:#d0d0d0;
-  display:none;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  z-index:20;
-}
-#notFound h1{font-size:96px;margin-bottom:10px}
-#notFound p{opacity:.7}
-
-/* AI OVERRIDE */
-#aiOverride{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.85);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:30;
-}
-#aiBox{max-width:420px}
-#aiOverrideText{
-  font-size:15px;
-  line-height:1.6;
-  margin-bottom:20px;
-}
-#magicBtn{
-  background:linear-gradient(135deg,#6a00ff,#00f2ff);
-  border:none;
-  padding:12px 22px;
-  font-weight:bold;
-  cursor:pointer;
-  border-radius:6px;
-}
-
-/* MAGIC OVERLAY */
-#magicOverlay{
-  position:fixed;
-  inset:0;
-  background:
-    radial-gradient(circle at center,
-      rgba(120,0,255,.45),
-      rgba(0,242,255,.35),
-      rgba(20,20,60,.95)
-    );
-  opacity:0;
-  pointer-events:none;
-  z-index:40;
-  backdrop-filter: blur(0px);
-  transition: opacity .4s ease, backdrop-filter .6s ease;
-}
-#magicOverlay.active{
-  opacity:1;
-  backdrop-filter: blur(14px);
-}
-  /* RETRO PAGE */
-#retroPage{
-  position:fixed;
-  inset:0;
-  background:black;
-  color:white;
-  display:none;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:30px;
-  font-size:32px;
-  font-weight:bold;
-  letter-spacing:2px;
-  z-index:50;
-}
+  /* CLOCK WRAPPER */
   #retroClockWrap{
-  margin-top:30px;
-  opacity:0;
-  transition:opacity 1.5s ease;
-}
+    opacity:0;
+    transition:opacity 2s ease; /* Smooth fade in */
+    margin-top: 50px; /* Space from top/center */
+  }
 
-#retroClockFace{
-  width:180px;
-  height:180px;
-  border:2px solid #ccc;
-  border-radius:50%;
-  position:relative;
-  margin:auto;
-}
+  /* CLOCK FACE */
+  #retroClockFace{
+    width:180px;
+    height:180px;
+    border:2px solid #ccc;
+    border-radius:50%;
+    position:relative;
+    margin:auto;
+  }
 
-.retroHand{
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform-origin:0% 50%;
-  transform:translateY(-50%);
-  background:#ccc;
-}
+  /* HANDS */
+  .retroHand{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform-origin:0% 50%;
+    transform:translateY(-50%);
+    background:#ccc;
+  }
+  .retroHour{width:35%;height:4px}
+  .retroMinute{width:50%;height:3px}
+  .retroSecond{width:55%;height:2px;background:red}
 
-.retroHour{width:35%;height:4px}
-.retroMinute{width:50%;height:3px}
-.retroSecond{width:55%;height:2px;background:red}
+  .retroCenter{
+    width:8px;height:8px;
+    background:#ccc;
+    border-radius:50%;
+    position:absolute;
+    top:50%;left:50%;
+    transform:translate(-50%,-50%);
+  }
 
-.retroCenter{
-  width:8px;height:8px;
-  background:#ccc;
-  border-radius:50%;
-  position:absolute;
-  top:50%;left:50%;
-  transform:translate(-50%,-50%);
-}
-  #retroClock{
-  opacity:0;
-  transition: opacity 2s ease;
-}
-#retroClock.active{
-  opacity:1;
-}
+  /* GENERAL STYLES */
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:black;overflow:hidden;font-family:Arial;color:white}
+
+  /* VIDEO */
+  #videoStage{position:fixed;inset:0;z-index:1}
+  video{width:100vw;height:100vh;object-fit:cover}
+
+  /* COCKPIT */
+  #cockpit{position:fixed;inset:0;z-index:3;pointer-events:none}
+  #cockpit img{width:100%;height:100%;object-fit:cover}
+
+  /* AI */
+  #ai{
+    position:fixed;
+    bottom:20px;
+    left:20px;
+    z-index:4;
+    max-width:65%;
+    font-size:14px;
+    opacity:.9;
+  }
+
+  /* CONTROLS */
+  #controls{position:fixed;bottom:20px;right:20px;z-index:4}
+  button{
+    background:rgba(0,242,255,.25);
+    border:1px solid #00f2ff;
+    color:#00f2ff;
+    padding:12px 18px;
+    font-weight:bold;
+    cursor:pointer;
+  }
+  button:hover{background:#00f2ff;color:black}
+
+  /* TIME OVERLAY */
+  #timeOverlay{
+    position:fixed;
+    inset:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,0,0,.45);
+    opacity:0;
+    transition:opacity 1.5s ease;
+    z-index:5;
+    pointer-events:none;
+  }
+
+  /* MAIN CLOCK */
+  #clock{
+    width:240px;height:240px;
+    border:2px solid white;
+    border-radius:50%;
+    position:relative;
+  }
+  .number{position:absolute;transform:translate(-50%,-50%);font-size:14px}
+  .hand{
+    position:absolute;
+    top:50%;left:50%;
+    transform-origin:0% 50%;
+    transform:translateY(-50%);
+    background:white;
+  }
+  .hour{width:35%;height:4px}
+  .minute{width:50%;height:3px}
+  .second{width:50%;height:2px;background:red}
+  .center-dot{
+    width:8px;height:8px;background:white;border-radius:50%;
+    position:absolute;top:50%;left:50%;
+    transform:translate(-50%,-50%);
+  }
+  #dateText{margin-top:20px;font-size:24px;letter-spacing:2px}
+
+  /* FLASHES */
+  #flashWhite,#flashBlue{
+    position:fixed;inset:0;
+    opacity:0;
+    z-index:10;
+    pointer-events:none;
+    transition:opacity .4s ease;
+  }
+  #flashWhite{background:white}
+  #flashBlue{background:#0b1c2d}
+
+  /* 404 */
+  #notFound{
+    position:fixed;inset:0;
+    background:#111;
+    color:#d0d0d0;
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    z-index:20;
+  }
+  #notFound h1{font-size:96px;margin-bottom:10px}
+  #notFound p{opacity:.7}
+
+  /* AI OVERRIDE */
+  #aiOverride{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.85);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:30;
+  }
+  #aiBox{max-width:420px}
+  #aiOverrideText{
+    font-size:15px;
+    line-height:1.6;
+    margin-bottom:20px;
+  }
+  #magicBtn{
+    background:linear-gradient(135deg,#6a00ff,#00f2ff);
+    border:none;
+    padding:12px 22px;
+    font-weight:bold;
+    cursor:pointer;
+    border-radius:6px;
+  }
+
+  /* MAGIC OVERLAY */
+  #magicOverlay{
+    position:fixed;
+    inset:0;
+    background:
+      radial-gradient(circle at center,
+        rgba(120,0,255,.45),
+        rgba(0,242,255,.35),
+        rgba(20,20,60,.95)
+      );
+    opacity:0;
+    pointer-events:none;
+    z-index:40;
+    backdrop-filter: blur(0px);
+    transition: opacity .4s ease, backdrop-filter .6s ease;
+  }
+  #magicOverlay.active{
+    opacity:1;
+    backdrop-filter: blur(14px);
+  }
 </style>
 </head>
 <body>
@@ -275,19 +274,22 @@ button:hover{background:#00f2ff;color:black}
   </div>
 </div>
 <div id="magicOverlay"></div>
-<div id="retroPage"></div>
 
-<div id="retroTitleWrap">
-  <div id="retroTitle"></div>
-</div>
-
-<div id="retroClockWrap">
-  <div id="retroClockFace">
-    <div class="retroHand retroHour"></div>
-    <div class="retroHand retroMinute"></div>
-    <div class="retroHand retroSecond"></div>
-    <div class="retroCenter"></div>
+<div id="retroPage">
+  
+  <div id="retroTitleWrap">
+    <div id="retroTitle"></div>
   </div>
+
+  <div id="retroClockWrap">
+    <div id="retroClockFace">
+      <div class="retroHand retroHour"></div>
+      <div class="retroHand retroMinute"></div>
+      <div class="retroHand retroSecond"></div>
+      <div class="retroCenter"></div>
+    </div>
+  </div>
+
 </div>
 
 <audio id="clockSound" src="audio/clock.mp3" preload="auto"></audio>
@@ -295,7 +297,7 @@ button:hover{background:#00f2ff;color:black}
 
 <script>
 const typeSound = document.getElementById("typeSound");
-typeSound.volume = 0.3; // softer sound
+typeSound.volume = 0.3; 
 
 function playTypeSound(){
   typeSound.pause();
@@ -303,30 +305,27 @@ function playTypeSound(){
   typeSound.play().catch(()=>{});
 }
 
-// MODIFIED: Added 'callback' parameter to run code after typing finishes
+// Callback execution logic
 function typeTitle(text, year, callback){
   const title = document.getElementById("retroTitle");
   title.innerHTML = "";
   title.style.opacity = 1;
 
-  // timeline colors
-  if(year < 1900) title.style.color = "#cfa66a";      // sepia
-  else if(year < 2000) title.style.color = "#00ff88"; // CRT green
-  else if(year < 3000) title.style.color = "#00f2ff"; // neon
-  else title.style.color = "#b36bff";                 // cosmic
+  if(year < 1900) title.style.color = "#cfa66a";      
+  else if(year < 2000) title.style.color = "#00ff88"; 
+  else if(year < 3000) title.style.color = "#00f2ff"; 
+  else title.style.color = "#b36bff";                 
 
   let i = 0;
   const interval = setInterval(()=>{
     title.innerHTML += text[i];
-    playTypeSound(); // 🔊 typing sound
+    playTypeSound();
     i++;
 
     if(i >= text.length){
       clearInterval(interval);
-      typeSound.pause();       // 🛑 stop sound
+      typeSound.pause();
       typeSound.currentTime = 0;
-
-      // Execute the callback function if it exists
       if(callback) callback();
     }
   }, 90);
@@ -360,7 +359,6 @@ let chosenPath,chosenYear;
 let angle=0,clockInterval;
 let year=2026,dir=1;
 
-/* CLOCK NUMBERS */
 const clock=document.getElementById("clock");
 for(let i=1;i<=12;i++){
   const n=document.createElement("div");
@@ -396,12 +394,10 @@ function playVideo(src){
   video.play().catch(()=>{});
 }
 
-/* FLIGHT FLOW */
 function takeOff(){
   controls.style.display="none";
   cockpit.style.display="none";
   aiText.innerText="Engines online. Launching.";
-
   playVideo("videos/launch.mp4");
 
   video.onended=()=>{
@@ -496,40 +492,28 @@ That page cannot exist here.
 But I can try something else.`;
 }
 
-/* MAGIC ACTION */
 magicBtn.onclick = () => {
-
-  // 1️⃣ Magic colors
   magicOverlay.classList.add("active");
-
   setTimeout(()=>{
     magicOverlay.style.background =
       "linear-gradient(135deg,#6a00ff,#00f2ff,#ffd700)";
   },300);
 
-  // 2️⃣ Hard cut to void (black screen)
   setTimeout(()=>{
     magicOverlay.classList.remove("active");
     aiOverride.style.display = "none";
-
     document.body.style.background = "black";
   },1400);
 
-  // 3️⃣ Show retro page
   setTimeout(()=>{
     const retro = document.getElementById("retroPage");
     retro.style.display = "flex";
-
-    // MODIFIED: Pass 'fadeInRetroClock' as the callback function
     typeTitle(`WELCOME TO ${chosenYear}`, chosenYear, fadeInRetroClock);
-
   },2400);
 };
 
 function fadeInRetroClock(){
   const wrap = document.getElementById("retroClockWrap");
-
-  // fade in clock
   wrap.style.opacity = 1;
 
   const h = document.querySelector(".retroHour");
