@@ -19,6 +19,7 @@
     font-weight:bold;
     letter-spacing:2px;
     z-index:50;
+    transition: background-color 3s ease; /* Smooth BG transition */
   }
 
   /* TITLE */
@@ -45,7 +46,7 @@
     margin-top: 50px;
   }
 
-  /* CLOCK FACE */
+  /* CLOCK FACE (ANALOG) */
   #retroClockFace{
     width:180px;
     height:180px;
@@ -54,6 +55,16 @@
     position:relative;
     margin:auto;
     background: #111;
+  }
+
+  /* FUTURE CLOCK (DIGITAL) */
+  #futureClock{
+    display: none; /* Hidden by default */
+    font-family: 'Courier New', monospace;
+    font-size: 60px;
+    color: #00f2ff;
+    text-shadow: 0 0 10px #00f2ff, 0 0 20px #00f2ff;
+    margin-top: 30px;
   }
 
   /* HANDS */
@@ -108,13 +119,54 @@
     z-index: 4;
   }
 
-  /* RETRO IMAGE (NEW CSS) */
+  /* RETRO IMAGE */
   #retroImage{
     width:320px;
     margin-top:30px;
     opacity:0;
     transition:opacity 2s ease;
     filter: sepia(0.8);
+  }
+
+  /* PART A: DESCRIPTION TEXT */
+  #descContainer {
+    margin-top: 25px;
+    text-align: center;
+    max-width: 600px;
+    padding: 0 20px;
+    z-index: 60;
+  }
+  .desc-line {
+    font-family: 'Courier New', monospace;
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 12px;
+    opacity: 0;
+    transform: translateY(15px); /* Start slightly lower */
+    transition: opacity 1s ease, transform 1s ease;
+  }
+  .desc-line.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* PART C: ACTION BUTTON */
+  #actionBtn {
+    margin-top: 20px;
+    background: transparent;
+    border: 2px solid white;
+    color: white;
+    padding: 12px 24px;
+    font-size: 18px;
+    font-family: Arial, sans-serif;
+    cursor: pointer;
+    border-radius: 30px;
+    opacity: 0; /* Starts hidden */
+    transition: opacity 2s ease, box-shadow 0.3s ease, background 0.3s ease;
+  }
+  #actionBtn:hover {
+    box-shadow: 0 0 15px white;
+    background: rgba(255,255,255,0.1);
   }
 
   /* GENERAL STYLES */
@@ -322,17 +374,24 @@
   </div>
 
   <div id="retroClockWrap">
+    
     <div id="retroClockFace">
       <div id="retroPendulum"></div>
-      
       <div class="retroHand retroHour"></div>
       <div class="retroHand retroMinute"></div>
       <div class="retroHand retroSecond"></div>
       <div class="retroCenter"></div>
     </div>
+
+    <div id="futureClock">00:00:00</div>
+
   </div>
 
   <img id="retroImage" src="" alt="timeline image">
+
+  <div id="descContainer"></div>
+
+  <button id="actionBtn" onclick="goToExplainPage()">How did I reach here? 🤔</button>
 
 </div>
 
@@ -510,6 +569,7 @@ function playArrival(){
   playVideo("videos/arrival.mp4");
 
   video.onended=()=>{
+    // PART E: FUTURE PATH DIFFERENCE
     if(chosenPath==="past"){
       flashBlue.style.opacity="1";
       setTimeout(()=>{
@@ -522,6 +582,14 @@ function playArrival(){
         },2000);
 
       },800);
+    } 
+    else {
+      // FUTURE: SKIP 404, FLASH BLUE, GO DIRECTLY
+      flashBlue.style.opacity="1";
+      setTimeout(()=>{
+        flashBlue.style.opacity="0";
+        startFutureSequence();
+      }, 2000);
     }
   }
 }
@@ -555,6 +623,22 @@ magicBtn.onclick = () => {
   },2400);
 };
 
+// Start Future Sequence directly (skips Magic Click)
+function startFutureSequence(){
+  // Hide previous layers
+  document.body.style.background = "black";
+  timeOverlay.style.display = "none";
+  video.style.display = "none";
+  cockpit.style.display = "none";
+  ai.style.display = "none";
+
+  const retro = document.getElementById("retroPage");
+  retro.style.display = "flex";
+  
+  // Future color for typing
+  typeTitle(`WELCOME TO ${chosenYear}`, chosenYear, fadeInRetroClock);
+}
+
 // Pendulum Animation Logic for 1897
 function startPendulumClock(){
   const pendulum = document.getElementById("retroPendulum");
@@ -571,32 +655,56 @@ function startPendulumClock(){
   }, 30);
 }
 
-// MODIFIED: Includes Image Fade Logic
+// Digital Clock Logic for Future
+function startFutureClock(){
+  const fc = document.getElementById("futureClock");
+  const ac = document.getElementById("retroClockFace");
+  ac.style.display = "none";
+  fc.style.display = "block";
+
+  // Simulate a futuristic time
+  setInterval(()=>{
+    const d = new Date();
+    // Just random futuristic randomness added to seconds to look cool
+    const ms = Math.floor(Math.random() * 99);
+    fc.innerText = d.toTimeString().split(' ')[0] + ":" + ms;
+  }, 100);
+}
+
 function fadeInRetroClock(){
   const wrap = document.getElementById("retroClockWrap");
   const img = document.getElementById("retroImage");
 
   wrap.style.opacity = 1;
 
-  // 🔥 SET IMAGE BASED ON YEAR
+  // 🔥 SET IMAGE & CLOCK TYPE BASED ON YEAR
   if(chosenYear === 1897){
     img.src = "images/past_1897.jpg";
+    startPendulumClock();
   } else if(chosenYear === 1987){
     img.src = "images/past_1987.jpg";
+    // Normal ticking starts below
+  } else {
+    // Future
+    img.src = "images/future_city.jpg"; // You'll need this image or it breaks
+    startFutureClock(); 
   }
 
   // IMAGE FADE IN AFTER CLOCK
   setTimeout(()=>{
     img.style.opacity = 1;
+    
+    // 🟢 START NEW SEQUENCE AFTER IMAGE FADES
+    setTimeout(showDescriptionSequence, 1500);
+
   },1500);
 
   const h = document.querySelector(".retroHour");
   const m = document.querySelector(".retroMinute");
   const s = document.querySelector(".retroSecond");
 
-  // 🟢 1897 → Pendulum
-  if(chosenYear === 1897){
-    startPendulumClock();
+  // Skip normal ticking logic if 1897 (Pendulum) or Future (Digital)
+  if(chosenYear === 1897 || chosenYear > 2026){
     return;
   }
 
@@ -609,6 +717,80 @@ function fadeInRetroClock(){
     h.style.transform = `rotate(${sec/720}deg)`;
   },1000);
 }
+
+// ----------------------------------------------------
+// NEW CODE FOR DESCRIPTION, BACKGROUND, AND ACTION BTN
+// ----------------------------------------------------
+
+function showDescriptionSequence() {
+  const container = document.getElementById("descContainer");
+  container.innerHTML = ""; // Clear existing
+
+  let lines = [];
+
+  if(chosenYear === 1897) {
+    lines = [
+      "• Time here is measured by motion, not electronics.",
+      "• Energy is mechanical and visible.",
+      "• Whatever brought you here does not belong to this era."
+    ];
+  } else if(chosenYear === 1987) {
+    lines = [
+      "• Technology is accelerating, but limits still exist.",
+      "• Information travels through wires, not space.",
+      "• This timeline is closer to understanding time — but not ready."
+    ];
+  } else {
+    // Future Text
+    lines = [
+      "• The digital realm has consumed the physical.",
+      "• Consciousness is uploaded, not born.",
+      "• You are observing the echo of humanity."
+    ];
+  }
+
+  // Create P tags hidden
+  lines.forEach((txt, index) => {
+    const p = document.createElement("p");
+    p.innerText = txt;
+    p.className = "desc-line";
+    container.appendChild(p);
+
+    // Staggered Fade In
+    setTimeout(() => {
+      p.classList.add("visible");
+      
+      // If this is the last line, trigger background change
+      if(index === lines.length - 1) {
+        setTimeout(changeBackground, 1500);
+      }
+    }, index * 1200); // 1.2s delay between lines
+  });
+}
+
+function changeBackground() {
+  const retroPage = document.getElementById("retroPage");
+  
+  if(chosenYear === 1897) {
+    retroPage.style.background = "#2a2215"; // Sepia / Parchment
+  } else if(chosenYear === 1987) {
+    retroPage.style.background = "#001a0f"; // Dark Green / CRT
+  } else {
+    retroPage.style.background = "#02001c"; // Deep Neon Blue
+  }
+
+  // After BG transition starts, show button
+  setTimeout(showActionBtn, 2500);
+}
+
+function showActionBtn() {
+  const btn = document.getElementById("actionBtn");
+  btn.style.opacity = 1;
+}
+
+function goToExplainPage() {
+  // Navigate to new page with year
+  window.location.href = `explain.html?year=${chosenYear}`;
+}
 </script>
 </body>
-</html>
