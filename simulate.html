@@ -49,7 +49,7 @@
   #retroClockFace{
     width:180px;
     height:180px;
-    border:4px solid #555; /* Thicker rim for retro feel */
+    border:4px solid #555;
     border-radius:50%;
     position:relative;
     margin:auto;
@@ -76,16 +76,15 @@
     top: 50%;
     left: 50%;
     width: 4px;
-    height: 130px; /* Long rod */
-    background: #cfa66a; /* Sepia Gold */
-    transform-origin: top center; /* Swings from the center point */
+    height: 130px;
+    background: #cfa66a;
+    transform-origin: top center;
     transform: translateX(-50%) rotate(0deg); 
-    display: none; /* Only shows for 1897 */
-    z-index: 1; /* Behind hands */
+    display: none;
+    z-index: 1;
     box-shadow: 0 0 5px rgba(0,0,0,0.5);
   }
   
-  /* The Bob (Weight) at bottom of pendulum */
   #retroPendulum::after {
     content: '';
     position: absolute;
@@ -107,6 +106,15 @@
     top:50%;left:50%;
     transform:translate(-50%,-50%);
     z-index: 4;
+  }
+
+  /* RETRO IMAGE (NEW CSS) */
+  #retroImage{
+    width:320px;
+    margin-top:30px;
+    opacity:0;
+    transition:opacity 2s ease;
+    filter: sepia(0.8);
   }
 
   /* GENERAL STYLES */
@@ -323,6 +331,8 @@
       <div class="retroCenter"></div>
     </div>
   </div>
+
+  <img id="retroImage" src="" alt="timeline image">
 
 </div>
 
@@ -545,40 +555,52 @@ magicBtn.onclick = () => {
   },2400);
 };
 
-// 🟢 NEW: Pendulum Animation Logic for 1897
+// Pendulum Animation Logic for 1897
 function startPendulumClock(){
   const pendulum = document.getElementById("retroPendulum");
   const secondHand = document.querySelector(".retroSecond");
 
-  // Show Pendulum, Hide Second Hand
   pendulum.style.display = "block";
   secondHand.style.display = "none";
 
   let t = 0;
   setInterval(()=>{
-    // Swing math: -25deg to +25deg
     const angle = Math.sin(t) * 25;
-    // Apply to pendulum wrapper, centered by -50% X
     pendulum.style.transform = `translateX(-50%) rotate(${angle}deg)`;
     t += 0.08; 
   }, 30);
 }
 
+// MODIFIED: Includes Image Fade Logic
 function fadeInRetroClock(){
   const wrap = document.getElementById("retroClockWrap");
+  const img = document.getElementById("retroImage");
+
   wrap.style.opacity = 1;
+
+  // 🔥 SET IMAGE BASED ON YEAR
+  if(chosenYear === 1897){
+    img.src = "images/past_1897.jpg";
+  } else if(chosenYear === 1987){
+    img.src = "images/past_1987.jpg";
+  }
+
+  // IMAGE FADE IN AFTER CLOCK
+  setTimeout(()=>{
+    img.style.opacity = 1;
+  },1500);
 
   const h = document.querySelector(".retroHour");
   const m = document.querySelector(".retroMinute");
   const s = document.querySelector(".retroSecond");
 
-  // 🔥 CHECK FOR 1897
+  // 🟢 1897 → Pendulum
   if(chosenYear === 1897){
     startPendulumClock();
-    return; // Exit here, do not run normal ticking
+    return;
   }
 
-  // 🕰️ Normal Ticking for other years
+  // 🕰️ Normal ticking
   let sec = 0;
   setInterval(()=>{
     sec += 6;
