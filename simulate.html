@@ -179,6 +179,49 @@ button:hover{background:#00f2ff;color:black}
   letter-spacing:2px;
   z-index:50;
 }
+  #retroClockWrap{
+  margin-top:30px;
+  opacity:0;
+  transition:opacity 1.5s ease;
+}
+
+#retroClockFace{
+  width:180px;
+  height:180px;
+  border:2px solid #ccc;
+  border-radius:50%;
+  position:relative;
+  margin:auto;
+}
+
+.retroHand{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform-origin:0% 50%;
+  transform:translateY(-50%);
+  background:#ccc;
+}
+
+.retroHour{width:35%;height:4px}
+.retroMinute{width:50%;height:3px}
+.retroSecond{width:55%;height:2px;background:red}
+
+.retroCenter{
+  width:8px;height:8px;
+  background:#ccc;
+  border-radius:50%;
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+}
+  #retroClock{
+  opacity:0;
+  transition: opacity 2s ease;
+}
+#retroClock.active{
+  opacity:1;
+}
 </style>
 </head>
 
@@ -468,12 +511,60 @@ magicBtn.onclick = () => {
     const retro = document.getElementById("retroPage");
     retro.style.display = "flex";
     typeTitle(`WELCOME TO ${chosenYear}`, chosenYear);
+    startRetroClock();
   },2400);
 
 };
+  function showRetroClock(){
+  const clock = document.getElementById("clock");
+
+  // reset + show clock
+  clock.style.opacity = 0;
+  clock.style.transition = "opacity 2s ease";
+  clock.style.display = "block";
+
+  setTimeout(()=>{
+    clock.style.opacity = 1;
+    startRetroClock();
+  }, 500);
+}
+
+function startRetroClock(){
+  let sec = 0;
+  setInterval(()=>{
+    sec += 6;
+    secondHand.style.transform = `rotate(${sec}deg)`;
+    minuteHand.style.transform = `rotate(${sec/60}deg)`;
+    hourHand.style.transform = `rotate(${sec/720}deg)`;
+  }, 1000);
+}
+  function startRetroClock(){
+  const rc = document.getElementById("retroClock");
+  rc.classList.add("active");
+
+  let h = 10, m = 0, s = 0;
+
+  setInterval(()=>{
+    s++;
+    if(s===60){s=0;m++}
+    if(m===60){m=0;h++}
+    if(h===24)h=0;
+
+    rc.innerText =
+      `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+  },1000);
+  }
 </script>
 <div id="retroTitleWrap">
   <div id="retroTitle"></div>
 </div>
+  <div id="retroClockWrap">
+  <div id="retroClockFace">
+    <div class="retroHand retroHour"></div>
+    <div class="retroHand retroMinute"></div>
+    <div class="retroHand retroSecond"></div>
+    <div class="retroCenter"></div>
+  </div>
+  </div>
 </body>
 </html>
