@@ -246,8 +246,16 @@ button:hover{background:#00f2ff;color:black}
   <div id="retroPage"></div>
 
 <audio id="clockSound" src="audio/clock.mp3" preload="auto"></audio>
+  <audio id="typeSound" src="audio/type.mp3" preload="auto"></audio>
 
 <script>
+  const typeSound = document.getElementById("typeSound");
+typeSound.volume = 0.3; // softer sound
+  function playTypeSound(){
+  typeSound.pause();
+  typeSound.currentTime = 0;
+  typeSound.play().catch(()=>{});
+  }
   function typeTitle(text, year){
   const title = document.getElementById("retroTitle");
   title.innerHTML = "";
