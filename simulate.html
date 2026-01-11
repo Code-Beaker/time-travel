@@ -101,10 +101,36 @@ button:hover{background:#00f2ff;color:black}
   align-items:center;
   justify-content:center;
   z-index:20;
-  font-family:Arial;
 }
 #notFound h1{font-size:96px;margin-bottom:10px}
 #notFound p{opacity:.7}
+
+/* AI OVERRIDE */
+#aiOverride{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.85);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:30;
+}
+#aiBox{
+  max-width:420px;
+}
+#aiOverrideText{
+  font-size:15px;
+  line-height:1.6;
+  margin-bottom:20px;
+}
+#magicBtn{
+  background:linear-gradient(135deg,#6a00ff,#00f2ff);
+  border:none;
+  padding:12px 22px;
+  font-weight:bold;
+  cursor:pointer;
+  border-radius:6px;
+}
 </style>
 </head>
 
@@ -161,14 +187,21 @@ button:hover{background:#00f2ff;color:black}
   <p>Page not found</p>
 </div>
 
+<div id="aiOverride">
+  <div id="aiBox">
+    <p id="aiOverrideText"></p>
+    <button id="magicBtn">MAGIC 🪄</button>
+  </div>
+</div>
+
 <audio id="clockSound" src="audio/clock.mp3" preload="auto"></audio>
 
 <script>
-/* ===== CORE STATE (UNCHANGED) ===== */
 const video=document.getElementById("sceneVideo");
 const cockpit=document.getElementById("cockpit");
 const cockpitImg=document.getElementById("cockpitImg");
 const aiText=document.getElementById("aiText");
+const controls=document.getElementById("controls");
 
 const timeOverlay=document.getElementById("timeOverlay");
 const hourHand=document.querySelector(".hour");
@@ -179,6 +212,9 @@ const dateText=document.getElementById("dateText");
 const flashWhite=document.getElementById("flashWhite");
 const flashBlue=document.getElementById("flashBlue");
 const notFound=document.getElementById("notFound");
+
+const aiOverride=document.getElementById("aiOverride");
+const aiOverrideText=document.getElementById("aiOverrideText");
 
 const clockSound=document.getElementById("clockSound");
 clockSound.loop=true;
@@ -223,7 +259,7 @@ function playVideo(src){
   video.play().catch(()=>{});
 }
 
-/* ===== FLIGHT FLOW (UNCHANGED) ===== */
+/* FLIGHT FLOW */
 function takeOff(){
   controls.style.display="none";
   cockpit.style.display="none";
@@ -249,7 +285,6 @@ function takeOff(){
 
       dir=chosenPath==="future"?1:-1;
       year=2026;
-
       setTimeout(startClock,5000);
     }
   }
@@ -261,8 +296,7 @@ function startClock(){
   aiText.innerText="Temporal distortion detected.";
 
   const totalYears=Math.abs(chosenYear-year);
-  const ticks=200;
-  const step=Math.max(1,Math.ceil(totalYears/ticks));
+  const step=Math.max(1,Math.ceil(totalYears/200));
 
   clockInterval=setInterval(()=>{
     angle+=dir*70;
@@ -271,7 +305,6 @@ function startClock(){
     hourHand.style.transform=`rotate(${angle/120}deg)`;
 
     year+=dir*step;
-
     if((dir===1&&year>=chosenYear)||(dir===-1&&year<=chosenYear)){
       year=chosenYear;
       dateText.innerText=`01/01/${year}`;
@@ -286,7 +319,6 @@ function stopClock(){
   clearInterval(clockInterval);
   clockSound.pause();
   aiText.innerText="Timeline reached.";
-
   timeOverlay.style.display="none";
 
   flashWhite.style.opacity="1";
@@ -296,7 +328,6 @@ function stopClock(){
   },2000);
 }
 
-/* ===== ARRIVAL (EXTENDED SAFELY) ===== */
 function playArrival(){
   cockpit.style.display="none";
   aiText.innerText="Arriving in destination timeline.";
@@ -304,17 +335,28 @@ function playArrival(){
 
   video.onended=()=>{
     if(chosenPath==="past"){
-      // BLUE FLASH THEN 404
       flashBlue.style.opacity="1";
       setTimeout(()=>{
         flashBlue.style.opacity="0";
         notFound.style.display="flex";
+
         setTimeout(()=>{
-          // NEXT PHASE STARTS HERE
+          notFound.style.display="none";
+          showAiOverride();
         },2000);
+
       },800);
     }
   }
+}
+
+function showAiOverride(){
+  aiOverride.style.display="flex";
+  aiOverrideText.innerText=
+`This is the year ${chosenYear}.
+The internet does not exist in this timeline.
+That page cannot exist here.
+But I can try something else.`;
 }
 </script>
 
