@@ -65,14 +65,14 @@ button:hover{background:#00f2ff;color:black}
   flex-direction:column;z-index:20;
 }
 
-/* AI OVERRIDE (VOID) */
+/* AI OVERRIDE */
 #aiOverride{
   position:fixed;inset:0;
-  background:radial-gradient(circle at center,#111,#000);
+  background:radial-gradient(circle,#111,#000);
   display:none;align-items:center;justify-content:center;
   z-index:30;
 }
-#aiBox{max-width:420px;text-align:left}
+#aiBox{max-width:420px}
 #magicBtn{
   margin-top:20px;
   background:linear-gradient(135deg,#6a00ff,#00f2ff);
@@ -84,17 +84,15 @@ button:hover{background:#00f2ff;color:black}
   position:fixed;inset:0;
   background:radial-gradient(circle,#6a00ff,#00f2ff,#000);
   opacity:0;pointer-events:none;z-index:40;
-  transition:opacity .5s ease;
+  transition:.5s;
 }
 #magicOverlay.active{opacity:1}
 
-/* RETRO STUB */
+/* RETRO */
 #retroSite{
   position:fixed;inset:0;
-  display:none;
-  padding:40px;
-  background:black;
-  z-index:50;
+  display:none;padding:40px;
+  background:black;z-index:50;
 }
 </style>
 </head>
@@ -102,9 +100,7 @@ button:hover{background:#00f2ff;color:black}
 <body>
 
 <div id="videoStage"><video id="sceneVideo" playsinline preload="auto"></video></div>
-
 <div id="cockpit"><img id="cockpitImg" src="images/cockpit_ground.png"></div>
-
 <div id="ai"><p id="aiText">System online.</p></div>
 
 <div id="controls">
@@ -160,48 +156,39 @@ button:hover{background:#00f2ff;color:black}
   <p id="retroText"></p>
 </div>
 
-<audio id="clockSound" src="audio/clock.mp3" preload="auto"></audio>
+<audio id="clockSound" src="audio/clock.mp3"></audio>
 
 <script>
 const video=document.getElementById("sceneVideo");
-// UI ELEMENT REFERENCES (FIX)
-const pathBtns = document.getElementById("pathBtns");
-const yearBtns = document.getElementById("yearBtns");
-const pastYears = document.getElementById("pastYears");
-const futureYears = document.getElementById("futureYears");
-const goBtn = document.getElementById("goBtn");
-const ai = document.getElementById("ai");
-const videoStage = document.getElementById("videoStage");
-const cockpit=document.getElementById("cockpit");
-const cockpitImg=document.getElementById("cockpitImg");
+const pathBtns=document.getElementById("pathBtns");
+const yearBtns=document.getElementById("yearBtns");
+const pastYears=document.getElementById("pastYears");
+const futureYears=document.getElementById("futureYears");
+const goBtn=document.getElementById("goBtn");
+const ai=document.getElementById("ai");
 const aiText=document.getElementById("aiText");
 const controls=document.getElementById("controls");
-
+const cockpit=document.getElementById("cockpit");
+const cockpitImg=document.getElementById("cockpitImg");
 const timeOverlay=document.getElementById("timeOverlay");
 const hourHand=document.querySelector(".hour");
 const minuteHand=document.querySelector(".minute");
 const secondHand=document.querySelector(".second");
 const dateText=document.getElementById("dateText");
-
 const flashWhite=document.getElementById("flashWhite");
 const flashBlue=document.getElementById("flashBlue");
 const notFound=document.getElementById("notFound");
-
 const aiOverride=document.getElementById("aiOverride");
 const aiOverrideText=document.getElementById("aiOverrideText");
 const magicOverlay=document.getElementById("magicOverlay");
 const magicBtn=document.getElementById("magicBtn");
-
 const retro=document.getElementById("retroSite");
 const retroTitle=document.getElementById("retroTitle");
 const retroText=document.getElementById("retroText");
-
 const clockSound=document.getElementById("clockSound");
-clockSound.loop=true;
 
-let chosenPath,chosenYear,angle=0,clockInterval,year=2026,dir=1;
+let chosenPath,chosenYear,angle=0,year=2026,dir=1,clockInterval;
 
-/* BASIC FLOW */
 function selectPath(p){
   chosenPath=p;
   pathBtns.style.display="none";
@@ -209,25 +196,42 @@ function selectPath(p){
   pastYears.style.display=p==="past"?"block":"none";
   futureYears.style.display=p==="future"?"block":"none";
 }
-function selectYear(y){chosenYear=y;yearBtns.style.display="none";goBtn.style.display="block";}
-function goBack(){goBtn.style.display="none";yearBtns.style.display="block";}
-function playVideo(src){video.src=src;video.play().catch(()=>{});}
+
+function selectYear(y){
+  chosenYear=y;
+  yearBtns.style.display="none";
+  goBtn.style.display="block";
+}
+
+function goBack(){
+  goBtn.style.display="none";
+  yearBtns.style.display="block";
+}
+
+function playVideo(src){
+  video.src=src;
+  video.play().catch(()=>{});
+}
 
 function takeOff(){
+  dir = chosenPath==="future" ? 1 : -1;
   controls.style.display="none";
   cockpit.style.display="none";
   playVideo("videos/launch.mp4");
-  video.onended=()=>{playVideo("videos/fly.mp4");video.onended=()=>{
-    cockpit.style.display="block";
-    cockpitImg.src="images/cockpit_overlay.png";
-    playVideo(chosenPath==="future"?"videos/blackhole.mp4":"videos/wormhole.mp4");
-    setTimeout(startClock,5000);
-  }};
+  video.onended=()=>{
+    playVideo("videos/fly.mp4");
+    video.onended=()=>{
+      cockpit.style.display="block";
+      cockpitImg.src="images/cockpit_overlay.png";
+      playVideo(chosenPath==="future"?"videos/blackhole.mp4":"videos/wormhole.mp4");
+      setTimeout(startClock,5000);
+    };
+  };
 }
 
 function startClock(){
   timeOverlay.style.opacity="1";
-  clockSound.play().catch(()=>{});
+  clockSound.play();
   clockInterval=setInterval(()=>{
     angle+=dir*80;
     secondHand.style.transform=`rotate(${angle}deg)`;
@@ -235,7 +239,10 @@ function startClock(){
     hourHand.style.transform=`rotate(${angle/120}deg)`;
     year+=dir*2;
     dateText.innerText=`01/01/${year}`;
-    if(year===chosenYear){stopClock();}
+    if((dir===1&&year>=chosenYear)||(dir===-1&&year<=chosenYear)){
+      year=chosenYear;
+      stopClock();
+    }
   },40);
 }
 
@@ -263,9 +270,7 @@ function playArrival(){
 }
 
 function showAiOverride(){
-  video.pause();video.removeAttribute("src");video.load();
-  videoStage.style.display="none";
-  cockpit.style.display="none";
+  video.pause();video.src="";
   ai.style.display="none";
   aiOverride.style.display="flex";
   aiOverrideText.innerText=
@@ -274,21 +279,16 @@ The internet does not exist here.
 But I can try something else.`;
 }
 
-/* MAGIC */
 magicBtn.onclick=()=>{
   magicOverlay.classList.add("active");
   setTimeout(()=>{
     magicOverlay.classList.remove("active");
     aiOverride.style.display="none";
-    loadRetroStub();
+    retro.style.display="block";
+    retroTitle.innerText=`WELCOME TO ${chosenYear}`;
+    retroText.innerText="Timeline stabilized.";
   },1400);
 };
-
-function loadRetroStub(){
-  retro.style.display="block";
-  retroTitle.innerText=`WELCOME TO ${chosenYear}`;
-  retroText.innerText="Timeline stabilized. Retro interface loading next.";
-}
 </script>
 
 </body>
