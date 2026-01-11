@@ -18,7 +18,15 @@ video{width:100vw;height:100vh;object-fit:cover}
 #cockpit img{width:100%;height:100%;object-fit:cover}
 
 /* AI */
-#ai{position:fixed;bottom:20px;left:20px;z-index:4;max-width:65%;font-size:14px}
+#ai{
+  position:fixed;
+  bottom:20px;
+  left:20px;
+  z-index:4;
+  max-width:65%;
+  font-size:14px;
+  opacity:.9;
+}
 
 /* CONTROLS */
 #controls{position:fixed;bottom:20px;right:20px;z-index:4}
@@ -34,72 +42,127 @@ button:hover{background:#00f2ff;color:black}
 
 /* TIME OVERLAY */
 #timeOverlay{
-  position:fixed;inset:0;
-  display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
+  position:fixed;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
   background:rgba(0,0,0,.45);
-  opacity:0;transition:opacity 1.5s ease;
-  z-index:5;pointer-events:none;
+  opacity:0;
+  transition:opacity 1.5s ease;
+  z-index:5;
+  pointer-events:none;
 }
 
 /* CLOCK */
-#clock{width:240px;height:240px;border:2px solid white;border-radius:50%;position:relative}
+#clock{
+  width:240px;height:240px;
+  border:2px solid white;
+  border-radius:50%;
+  position:relative;
+}
 .number{position:absolute;transform:translate(-50%,-50%);font-size:14px}
-.hand{position:absolute;top:50%;left:50%;transform-origin:0% 50%;transform:translateY(-50%);background:white}
+.hand{
+  position:absolute;
+  top:50%;left:50%;
+  transform-origin:0% 50%;
+  transform:translateY(-50%);
+  background:white;
+}
 .hour{width:35%;height:4px}
 .minute{width:50%;height:3px}
 .second{width:50%;height:2px;background:red}
-.center-dot{width:8px;height:8px;background:white;border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}
-#dateText{margin-top:20px;font-size:24px}
+.center-dot{
+  width:8px;height:8px;background:white;border-radius:50%;
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+}
+#dateText{margin-top:20px;font-size:24px;letter-spacing:2px}
 
-/* FLASH */
-#flashWhite,#flashBlue{position:fixed;inset:0;opacity:0;z-index:10;transition:.4s}
+/* FLASHES */
+#flashWhite,#flashBlue{
+  position:fixed;inset:0;
+  opacity:0;
+  z-index:10;
+  pointer-events:none;
+  transition:opacity .4s ease;
+}
 #flashWhite{background:white}
 #flashBlue{background:#0b1c2d}
 
 /* 404 */
 #notFound{
   position:fixed;inset:0;
-  background:#111;color:#d0d0d0;
-  display:none;align-items:center;justify-content:center;
-  flex-direction:column;z-index:20;
+  background:#111;
+  color:#d0d0d0;
+  display:none;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  z-index:20;
 }
+#notFound h1{font-size:96px;margin-bottom:10px}
+#notFound p{opacity:.7}
 
 /* AI OVERRIDE */
 #aiOverride{
-  position:fixed;inset:0;
-  background:radial-gradient(circle,#111,#000);
-  display:none;align-items:center;justify-content:center;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.85);
+  display:none;
+  align-items:center;
+  justify-content:center;
   z-index:30;
 }
 #aiBox{max-width:420px}
+#aiOverrideText{
+  font-size:15px;
+  line-height:1.6;
+  margin-bottom:20px;
+}
 #magicBtn{
-  margin-top:20px;
   background:linear-gradient(135deg,#6a00ff,#00f2ff);
-  border:none;padding:12px 22px;font-weight:bold;cursor:pointer;
+  border:none;
+  padding:12px 22px;
+  font-weight:bold;
+  cursor:pointer;
+  border-radius:6px;
 }
 
-/* MAGIC */
+/* MAGIC OVERLAY */
 #magicOverlay{
-  position:fixed;inset:0;
-  background:radial-gradient(circle,#6a00ff,#00f2ff,#000);
-  opacity:0;pointer-events:none;z-index:40;
-  transition:.5s;
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(circle at center,
+      rgba(120,0,255,.45),
+      rgba(0,242,255,.35),
+      rgba(20,20,60,.95)
+    );
+  opacity:0;
+  pointer-events:none;
+  z-index:40;
+  backdrop-filter: blur(0px);
+  transition: opacity .4s ease, backdrop-filter .6s ease;
 }
-#magicOverlay.active{opacity:1}
-
-/* RETRO */
-#retroSite{
-  position:fixed;inset:0;
-  display:none;padding:40px;
-  background:black;z-index:50;
+#magicOverlay.active{
+  opacity:1;
+  backdrop-filter: blur(14px);
 }
 </style>
 </head>
 
 <body>
 
-<div id="videoStage"><video id="sceneVideo" playsinline preload="auto"></video></div>
+<div id="videoStage">
+  <video id="sceneVideo" playsinline preload="auto"></video>
+</div>
+
+<div id="cockpit">
+  <img id="cockpitImg" src="images/cockpit_ground.png">
+</div>
+
 <div id="ai"><p id="aiText">System online.</p></div>
 
 <div id="controls">
@@ -107,6 +170,7 @@ button:hover{background:#00f2ff;color:black}
     <button onclick="selectPath('past')">PAST</button>
     <button onclick="selectPath('future')">FUTURE</button>
   </div>
+
   <div id="yearBtns" style="display:none">
     <div id="pastYears">
       <button onclick="selectYear(1897)">1897</button>
@@ -117,6 +181,7 @@ button:hover{background:#00f2ff;color:black}
       <button onclick="selectYear(3079)">3079</button>
     </div>
   </div>
+
   <div id="goBtn" style="display:none">
     <button onclick="goBack()">← BACK</button>
     <button onclick="takeOff()">TAKE OFF 🚀</button>
@@ -150,42 +215,47 @@ button:hover{background:#00f2ff;color:black}
 
 <div id="magicOverlay"></div>
 
-<div id="retroSite">
-  <h1 id="retroTitle"></h1>
-  <p id="retroText"></p>
-</div>
-
-<audio id="clockSound" src="audio/clock.mp3"></audio>
+<audio id="clockSound" src="audio/clock.mp3" preload="auto"></audio>
 
 <script>
 const video=document.getElementById("sceneVideo");
-const pathBtns=document.getElementById("pathBtns");
-const yearBtns=document.getElementById("yearBtns");
-const pastYears=document.getElementById("pastYears");
-const futureYears=document.getElementById("futureYears");
-const goBtn=document.getElementById("goBtn");
-const ai=document.getElementById("ai");
+const cockpit=document.getElementById("cockpit");
+const cockpitImg=document.getElementById("cockpitImg");
 const aiText=document.getElementById("aiText");
 const controls=document.getElementById("controls");
-const cockpitImg=document.getElementById("cockpitImg");
+
 const timeOverlay=document.getElementById("timeOverlay");
 const hourHand=document.querySelector(".hour");
 const minuteHand=document.querySelector(".minute");
 const secondHand=document.querySelector(".second");
 const dateText=document.getElementById("dateText");
+
 const flashWhite=document.getElementById("flashWhite");
 const flashBlue=document.getElementById("flashBlue");
 const notFound=document.getElementById("notFound");
+
 const aiOverride=document.getElementById("aiOverride");
 const aiOverrideText=document.getElementById("aiOverrideText");
 const magicOverlay=document.getElementById("magicOverlay");
 const magicBtn=document.getElementById("magicBtn");
-const retro=document.getElementById("retroSite");
-const retroTitle=document.getElementById("retroTitle");
-const retroText=document.getElementById("retroText");
-const clockSound=document.getElementById("clockSound");
 
-let chosenPath,chosenYear,angle=0,year=2026,dir=1,clockInterval;
+const clockSound=document.getElementById("clockSound");
+clockSound.loop=true;
+
+let chosenPath,chosenYear;
+let angle=0,clockInterval;
+let year=2026,dir=1;
+
+/* CLOCK NUMBERS */
+const clock=document.getElementById("clock");
+for(let i=1;i<=12;i++){
+  const n=document.createElement("div");
+  n.className="number";n.innerText=i;
+  const r=100,a=(i-3)*30*Math.PI/180;
+  n.style.left=120+r*Math.cos(a)+"px";
+  n.style.top=120+r*Math.sin(a)+"px";
+  clock.appendChild(n);
+}
 
 function selectPath(p){
   chosenPath=p;
@@ -193,14 +263,14 @@ function selectPath(p){
   yearBtns.style.display="block";
   pastYears.style.display=p==="past"?"block":"none";
   futureYears.style.display=p==="future"?"block":"none";
+  aiText.innerText="Select destination year.";
 }
-
 function selectYear(y){
   chosenYear=y;
-  yearBtns.style.display="none";
   goBtn.style.display="block";
+  yearBtns.style.display="none";
+  aiText.innerText="Destination locked.";
 }
-
 function goBack(){
   goBtn.style.display="none";
   yearBtns.style.display="block";
@@ -208,82 +278,123 @@ function goBack(){
 
 function playVideo(src){
   video.src=src;
+  video.muted=false;
   video.play().catch(()=>{});
 }
 
+/* FLIGHT FLOW */
 function takeOff(){
-  dir = chosenPath==="future" ? 1 : -1;
   controls.style.display="none";
   cockpit.style.display="none";
+  aiText.innerText="Engines online. Launching.";
+
   playVideo("videos/launch.mp4");
+
   video.onended=()=>{
+    aiText.innerText="Leaving Earth orbit.";
     playVideo("videos/fly.mp4");
+
     video.onended=()=>{
-  
-      playVideo(chosenPath==="future"?"videos/blackhole.mp4":"videos/wormhole.mp4");
+      cockpit.style.display="block";
+      cockpitImg.src="images/cockpit_overlay.png";
+
+      if(chosenPath==="future"){
+        aiText.innerText="Approaching black hole.";
+        playVideo("videos/blackhole.mp4");
+      }else{
+        aiText.innerText="Entering wormhole.";
+        playVideo("videos/wormhole.mp4");
+      }
+
+      dir=chosenPath==="future"?1:-1;
+      year=2026;
       setTimeout(startClock,5000);
-    };
-  };
+    }
+  }
 }
 
 function startClock(){
   timeOverlay.style.opacity="1";
-  clockSound.play();
+  clockSound.play().catch(()=>{});
+  aiText.innerText="Temporal distortion detected.";
+
+  const totalYears=Math.abs(chosenYear-year);
+  const step=Math.max(1,Math.ceil(totalYears/200));
+
   clockInterval=setInterval(()=>{
-    angle+=dir*80;
+    angle+=dir*70;
     secondHand.style.transform=`rotate(${angle}deg)`;
     minuteHand.style.transform=`rotate(${angle/10}deg)`;
     hourHand.style.transform=`rotate(${angle/120}deg)`;
-    year+=dir*2;
-    dateText.innerText=`01/01/${year}`;
+
+    year+=dir*step;
     if((dir===1&&year>=chosenYear)||(dir===-1&&year<=chosenYear)){
       year=chosenYear;
+      dateText.innerText=`01/01/${year}`;
       stopClock();
+      return;
     }
+    dateText.innerText=`01/01/${year}`;
   },40);
 }
 
 function stopClock(){
   clearInterval(clockInterval);
   clockSound.pause();
+  aiText.innerText="Timeline reached.";
   timeOverlay.style.display="none";
+
   flashWhite.style.opacity="1";
-  setTimeout(()=>{flashWhite.style.opacity="0";playArrival();},1500);
+  setTimeout(()=>{
+    flashWhite.style.opacity="0";
+    playArrival();
+  },2000);
 }
 
 function playArrival(){
-
+  cockpit.style.display="none";
+  aiText.innerText="Arriving in destination timeline.";
   playVideo("videos/arrival.mp4");
+
   video.onended=()=>{
     if(chosenPath==="past"){
       flashBlue.style.opacity="1";
       setTimeout(()=>{
         flashBlue.style.opacity="0";
         notFound.style.display="flex";
-        setTimeout(showAiOverride,2000);
+
+        setTimeout(()=>{
+          notFound.style.display="none";
+          showAiOverride();
+        },2000);
+
       },800);
     }
-  };
+  }
 }
 
 function showAiOverride(){
-  video.pause();video.src="";
-  ai.style.display="none";
   aiOverride.style.display="flex";
   aiOverrideText.innerText=
 `This is the year ${chosenYear}.
-The internet does not exist here.
+The internet does not exist in this timeline.
+That page cannot exist here.
 But I can try something else.`;
 }
 
+/* MAGIC ACTION */
 magicBtn.onclick=()=>{
   magicOverlay.classList.add("active");
+
+  setTimeout(()=>{
+    magicOverlay.style.background=
+      "linear-gradient(135deg,#6a00ff,#00f2ff,#ffd700)";
+  },300);
+
   setTimeout(()=>{
     magicOverlay.classList.remove("active");
+    magicOverlay.style.opacity="0";
     aiOverride.style.display="none";
-    retro.style.display="block";
-    retroTitle.innerText=`WELCOME TO ${chosenYear}`;
-    retroText.innerText="Timeline stabilized.";
   },1400);
 };
 </script>
