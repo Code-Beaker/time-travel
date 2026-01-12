@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Night Sky</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+  *{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+  }
+
+  body{
+    height:100vh;
+    width:100vw;
+    overflow:hidden;
+    font-family: Arial, sans-serif;
+    background:black;
+    color:white;
+  }
+
+  /* SKY CONTAINER */
+  #sky{
+    position:fixed;
+    inset:0;
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  /* TEXT OVERLAY */
+  #skyText{
+    background:rgba(0,0,0,0.4);
+    padding:20px 30px;
+    border-radius:12px;
+    font-size:28px;
+    letter-spacing:2px;
+    backdrop-filter: blur(6px);
+    text-align:center;
+  }
+</style>
+</head>
+
+<body>
+
+<div id="sky">
+  <div id="skyText"></div>
+</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const year = params.get("year");
+
+  const sky = document.getElementById("sky");
+  const text = document.getElementById("skyText");
+
+  if(year === "1897"){
+    sky.style.backgroundImage = "url('images/sky_1897.jpg')";
+    text.innerText = "Night Sky — Year 1897";
+  }
+  else if(year === "1987"){
+    sky.style.backgroundImage = "url('images/sky_1987.jpg')";
+    text.innerText = "Night Sky — Year 1987";
+  }
+  else if(year === "2050"){
+    sky.style.backgroundImage = "url('images/sky_2050.jpg')";
+    text.innerText = "Night Sky — Year 2050";
+  }
+  else if(year === "3079"){
+    sky.style.backgroundImage = "url('images/sky_3079.jpg')";
+    text.innerText = "Night Sky — Year 3079";
+  }
+  else{
+    text.innerText = "Unknown Timeline";
+  }
+</script>
+
+</body>
+</html>
