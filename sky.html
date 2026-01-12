@@ -2,82 +2,200 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Night Sky</title>
+<title>How did I reach here?</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-  *{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-  }
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
 
-  body{
-    height:100vh;
-    width:100vw;
-    overflow:hidden;
-    font-family: Arial, sans-serif;
-    background:black;
-    color:white;
-  }
+body{
+  min-height:100vh;
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  color:white;
+  font-family: Arial, sans-serif;
+  overflow-x:hidden;
+}
 
-  /* SKY CONTAINER */
-  #sky{
-    position:fixed;
-    inset:0;
-    background-size:cover;
-    background-position:center;
-    background-repeat:no-repeat;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-  }
+/* GLOBAL WRAPPER */
+.page{
+  min-height:100vh;
+  padding:60px 20px 120px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+}
 
-  /* TEXT OVERLAY */
-  #skyText{
-    background:rgba(0,0,0,0.4);
-    padding:20px 30px;
-    border-radius:12px;
-    font-size:28px;
-    letter-spacing:2px;
-    backdrop-filter: blur(6px);
-    text-align:center;
+/* TITLE */
+.title{
+  font-size:42px;
+  font-weight:900;
+  opacity:0;
+  animation: fadeIn 1.5s forwards;
+}
+
+/* TIMELINE */
+.timeline{
+  margin-top:60px;
+  font-size:18px;
+  line-height:1.6;
+}
+
+.step{
+  opacity:0;
+  animation: fadeUp 1s forwards;
+}
+
+.arrow{
+  font-size:32px;
+  margin:15px 0;
+  opacity:0;
+  animation: fadeIn 1s forwards;
+}
+
+/* DESCRIPTION */
+.description{
+  max-width:800px;
+  margin-top:50px;
+  font-size:17px;
+  line-height:1.7;
+  opacity:0;
+  animation: fadeIn 2s forwards;
+}
+
+/* BIG WELCOME */
+.welcome{
+  margin-top:70px;
+  font-size:48px;
+  font-weight:900;
+  opacity:0;
+  animation: fadeIn 2s forwards;
+}
+
+/* SKY BUTTON */
+.sky-btn{
+  margin-top:40px;
+  padding:15px 32px;
+  font-size:18px;
+  border:2px solid white;
+  background:transparent;
+  color:white;
+  border-radius:30px;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.sky-btn:hover{
+  background:white;
+  color:black;
+}
+
+/* ANIMATIONS */
+@keyframes fadeIn{
+  to{opacity:1;}
+}
+@keyframes fadeUp{
+  to{
+    opacity:1;
+    transform:translateY(0);
   }
+}
+
+/* ===== TIMELINE THEMES ===== */
+
+/* 1897 */
+body.past-1897{
+  background-image:url("images/past_1897.jpg");
+  font-family: "Courier New", monospace;
+}
+body.past-1897 .title,
+body.past-1897 .welcome{
+  color:#cfa66a;
+}
+
+/* 1987 */
+body.past-1987{
+  background-image:url("images/past_1987.jpg");
+  font-family: "Courier New", monospace;
+}
+body.past-1987 .title,
+body.past-1987 .welcome{
+  color:#00ff88;
+}
+
+/* 2050 */
+body.future-2050{
+  background-image:url("images/future_2050.jpg");
+  font-family: Arial, sans-serif;
+}
+body.future-2050 .title,
+body.future-2050 .welcome{
+  color:#00f2ff;
+}
+
+/* 3079 */
+body.future-3079{
+  background-image:url("images/future_3079.jpg");
+  font-family: Arial, sans-serif;
+}
+body.future-3079 .title,
+body.future-3079 .welcome{
+  color:#b36bff;
+}
 </style>
 </head>
 
 <body>
+<div class="page">
+  <div class="title">How did I reach here? 🤔</div>
 
-<div id="sky">
-  <div id="skyText"></div>
+  <div class="timeline">
+    <div class="step" style="animation-delay:1.2s">
+      You launched from Earth aboard an experimental spacecraft.
+    </div>
+
+    <div class="arrow" style="animation-delay:2.2s">↓</div>
+
+    <div class="step" style="animation-delay:3.2s">
+      The spacecraft traveled through deep space and encountered an extreme gravitational anomaly.
+    </div>
+
+    <div class="arrow" style="animation-delay:4.2s">↓</div>
+
+    <div class="step" style="animation-delay:5.2s">
+      Space and time were distorted, allowing the craft to exit reality at a different point in time.
+    </div>
+  </div>
+
+  <div class="description" style="animation-delay:6.5s">
+    Wormholes and black holes are predicted by Einstein’s theory of relativity.  
+    Under extreme gravity, spacetime can bend, stretch, and fold, allowing shortcuts through time itself.  
+    By exploiting relativistic effects such as time dilation and gravitational slingshots, your journey bypassed normal chronological flow — delivering you here.
+  </div>
+
+  <div class="welcome" style="animation-delay:8.5s">
+    Welcome to the timeline ✨
+  </div>
+
+  <button class="sky-btn" style="animation-delay:9.5s">
+    Explore the night sky 🌌
+  </button>
 </div>
 
 <script>
-  const params = new URLSearchParams(window.location.search);
-  const year = params.get("year");
+const params = new URLSearchParams(window.location.search);
+const year = params.get("year");
 
-  const sky = document.getElementById("sky");
-  const text = document.getElementById("skyText");
-
-  if(year === "1897"){
-    sky.style.backgroundImage = "url('images/sky_1897.jpg')";
-    text.innerText = "Night Sky — Year 1897";
-  }
-  else if(year === "1987"){
-    sky.style.backgroundImage = "url('images/sky_1987.jpg')";
-    text.innerText = "Night Sky — Year 1987";
-  }
-  else if(year === "2050"){
-    sky.style.backgroundImage = "url('images/sky_2050.jpg')";
-    text.innerText = "Night Sky — Year 2050";
-  }
-  else if(year === "3079"){
-    sky.style.backgroundImage = "url('images/sky_3079.jpg')";
-    text.innerText = "Night Sky — Year 3079";
-  }
-  else{
-    text.innerText = "Unknown Timeline";
-  }
+if(year === "1897") document.body.classList.add("past-1897");
+else if(year === "1987") document.body.classList.add("past-1987");
+else if(year === "2050") document.body.classList.add("future-2050");
+else if(year === "3079") document.body.classList.add("future-3079");
 </script>
 
 </body>
