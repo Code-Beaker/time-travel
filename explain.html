@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Timeline Explanation</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  background:#0b0b0b;
+  color:#eaeaea;
+  font-family: "Courier New", monospace;
+  overflow-x:hidden;
+}
+
+/* CONTAINER */
+#container{
+  max-width:900px;
+  margin:0 auto;
+  padding:80px 20px 120px;
+}
+
+/* TITLE */
+#title{
+  font-size:40px;
+  text-align:center;
+  margin-bottom:60px;
+  opacity:0;
+  transition:opacity 2s ease;
+}
+
+/* TIMELINE */
+.timeline{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:30px;
+}
+
+.step{
+  font-size:20px;
+  opacity:0;
+  transform:translateY(20px);
+  transition:opacity 1.5s ease, transform 1.5s ease;
+  text-align:center;
+  max-width:700px;
+}
+
+.arrow{
+  font-size:32px;
+  opacity:0;
+  transition:opacity 1s ease;
+}
+
+/* DESCRIPTION */
+#description{
+  margin-top:70px;
+  font-size:18px;
+  line-height:1.8;
+  opacity:0;
+  transition:opacity 2s ease;
+}
+
+/* BIG TEXT */
+#bigText{
+  margin-top:80px;
+  text-align:center;
+  font-size:48px;
+  letter-spacing:4px;
+  opacity:0;
+  transition:opacity 2s ease;
+}
+
+/* SKY BUTTON */
+#skyBtn{
+  margin:70px auto 0;
+  display:block;
+  padding:16px 36px;
+  font-size:20px;
+  background:transparent;
+  border:2px solid #eaeaea;
+  color:#eaeaea;
+  cursor:pointer;
+  border-radius:40px;
+  opacity:0;
+  transition:opacity 2s ease, background .3s ease;
+}
+
+#skyBtn:hover{
+  background:rgba(255,255,255,0.1);
+}
+</style>
+</head>
+
+<body>
+<div id="container">
+
+  <div id="title">How did I reach here? 🤔</div>
+
+  <div class="timeline">
+    <div class="step" id="step1"></div>
+    <div class="arrow" id="arrow1">↓</div>
+
+    <div class="step" id="step2"></div>
+    <div class="arrow" id="arrow2">↓</div>
+
+    <div class="step" id="step3"></div>
+  </div>
+
+  <div id="description"></div>
+
+  <div id="bigText"></div>
+
+  <button id="skyBtn">Explore the Night Sky ✨</button>
+
+</div>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const year = parseInt(params.get("year"));
+
+const title = document.getElementById("title");
+const step1 = document.getElementById("step1");
+const step2 = document.getElementById("step2");
+const step3 = document.getElementById("step3");
+const arrow1 = document.getElementById("arrow1");
+const arrow2 = document.getElementById("arrow2");
+const desc = document.getElementById("description");
+const bigText = document.getElementById("bigText");
+const skyBtn = document.getElementById("skyBtn");
+
+/* SET BACKGROUND FIRST */
+if(year < 2000){
+  document.body.style.background = "#120e08"; // past
+} else {
+  document.body.style.background = "#050b1a"; // future
+}
+
+/* TEXT CONTENT */
+if(year < 2000){
+  step1.innerText = "You departed Earth aboard an experimental spacecraft.";
+  step2.innerText = "You crossed deep space and entered a naturally occurring wormhole, millions of kilometers from Earth.";
+  step3.innerText = "The wormhole distorted space-time and released you into the past.";
+
+  desc.innerText =
+  "A wormhole is a theoretical shortcut through space-time predicted by Einstein’s General Theory of Relativity. " +
+  "Under extreme gravitational conditions, space and time can bend and connect distant points. " +
+  "Passing through such a structure allows movement not only across space, but across time itself.";
+
+  bigText.innerText = "WELCOME TO THE PAST";
+} 
+else {
+  step1.innerText = "You launched from Earth using a relativistic spacecraft.";
+  step2.innerText = "You approached a supermassive black hole and used its gravity for a time slingshot.";
+  step3.innerText = "Extreme time dilation carried you far into the future.";
+
+  desc.innerText =
+  "Near a black hole, gravity becomes so intense that time slows dramatically. " +
+  "By skimming its edge without falling in, a spacecraft can experience extreme time dilation. " +
+  "While only hours pass for the traveler, centuries can pass for the rest of the universe.";
+
+  bigText.innerText = "WELCOME TO THE FUTURE";
+}
+
+/* ANIMATION SEQUENCE */
+setTimeout(()=>{ title.style.opacity = 1; },500);
+
+setTimeout(()=>{
+  step1.style.opacity = 1;
+  step1.style.transform = "translateY(0)";
+},1800);
+
+setTimeout(()=>{ arrow1.style.opacity = 1; },3000);
+
+setTimeout(()=>{
+  step2.style.opacity = 1;
+  step2.style.transform = "translateY(0)";
+},3800);
+
+setTimeout(()=>{ arrow2.style.opacity = 1; },5000);
+
+setTimeout(()=>{
+  step3.style.opacity = 1;
+  step3.style.transform = "translateY(0)";
+},5800);
+
+setTimeout(()=>{ desc.style.opacity = 1; },7500);
+
+setTimeout(()=>{ bigText.style.opacity = 1; },9500);
+
+setTimeout(()=>{ skyBtn.style.opacity = 1; },11000);
+
+/* SKY BUTTON (future feature) */
+skyBtn.onclick = ()=>{
+  alert("Sky simulation coming next 🌌");
+};
+</script>
+</body>
+</html>
