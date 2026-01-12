@@ -5,24 +5,44 @@
 <title>Time Consequence</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-  /* --- CORE LAYOUT --- */
+  /* --- FIX 1: REMOVE ANDROID HIGHLIGHT GLOBALLY --- */
+  * { 
+    -webkit-tap-highlight-color: transparent; 
+  }
+
+  /* --- MANDATORY FIX 2: POINTER EVENTS LOCKDOWN --- */
   body {
     margin: 0;
     padding: 0;
     background-color: #000;
     color: #fff;
-    font-family: 'Courier New', Courier, monospace; /* Default fallback */
-    overflow: hidden;
+    font-family: 'Courier New', Courier, monospace;
+    overflow-y: auto;
+    overflow-x: hidden; 
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh;
+    min-height: 100vh;
     user-select: none;
+    /* GLOBAL LOCK */
+    pointer-events: none;
+  }
+
+  /* --- MANDATORY FIX 2 & 3: CONTAINER SAFETY --- */
+  #stage,
+  #narrativeBox,
+  #timeDialogue,
+  #clockContainer,
+  #userActions {
+    pointer-events: none;
+  }
+  
+  #userActions:empty {
+    pointer-events: none;
   }
 
   /* --- FONTS & TYPOGRAPHY --- */
-  /* Class applied via JS based on timeline */
   .font-past {
     font-family: 'Georgia', 'Times New Roman', serif;
     letter-spacing: 1px;
@@ -40,6 +60,7 @@
     max-width: 800px;
     position: relative;
     z-index: 10;
+    padding: 50px 0;
   }
 
   /* --- TEXT FADES --- */
@@ -64,6 +85,11 @@
   }
 
   /* --- BUTTONS --- */
+  /* MANDATORY FIX 2: RE-ENABLE BUTTONS */
+  button, .cinematic-btn, .final-btn {
+    pointer-events: auto;
+  }
+
   .cinematic-btn {
     background: transparent;
     border: 1px solid rgba(255,255,255,0.4);
@@ -86,9 +112,9 @@
     opacity: 1;
   }
   
-  /* User Sent Message Animation */
   .sent-anim {
     animation: slideUpFade 1s forwards;
+    pointer-events: none;
   }
   @keyframes slideUpFade {
     0% { opacity: 1; transform: translateY(0); }
@@ -97,11 +123,11 @@
 
   /* --- THE CLOCK --- */
   #clockContainer {
-    display: none; /* Hidden initially */
+    display: none; 
     flex-direction: column;
     align-items: center;
     margin-bottom: 30px;
-    transition: opacity 2s ease;
+    transition: opacity 3s ease; 
     opacity: 0;
   }
   #clockBody {
@@ -113,6 +139,24 @@
     box-shadow: 0 0 20px rgba(255, 0, 0, 0.6);
     position: relative;
     transition: border-color 3s ease, box-shadow 3s ease;
+  }
+
+  /* SHAKE ANIMATION */
+  @keyframes shake {
+    0% { transform: translate(1px, 1px) rotate(0deg); }
+    10% { transform: translate(-1px, -2px) rotate(-1deg); }
+    20% { transform: translate(-3px, 0px) rotate(1deg); }
+    30% { transform: translate(3px, 2px) rotate(0deg); }
+    40% { transform: translate(1px, -1px) rotate(1deg); }
+    50% { transform: translate(-1px, 2px) rotate(-1deg); }
+    60% { transform: translate(-3px, 1px) rotate(0deg); }
+    70% { transform: translate(3px, 1px) rotate(-1deg); }
+    80% { transform: translate(-1px, -1px) rotate(1deg); }
+    90% { transform: translate(1px, 2px) rotate(0deg); }
+    100% { transform: translate(1px, -2px) rotate(-1deg); }
+  }
+  .shake {
+    animation: shake 0.5s infinite;
   }
   
   /* Clock Hands */
@@ -157,10 +201,10 @@
 
   /* Clock Spin Animations */
   .spin-cw {
-    animation: spinClock 2s linear infinite;
+    animation: spinClock 0.2s linear infinite;
   }
   .spin-ccw {
-    animation: spinClockCCW 2s linear infinite;
+    animation: spinClockCCW 0.2s linear infinite;
   }
 
   @keyframes spinClock {
@@ -172,7 +216,7 @@
     100% { transform: rotate(0deg); }
   }
 
-  /* Dialogue Box for Time */
+  /* Dialogue Box */
   #timeDialogue {
     min-height: 120px;
     margin-top: 20px;
@@ -206,7 +250,7 @@
     opacity: 0;
     pointer-events: none;
     z-index: 100;
-    transition: opacity 0.2s ease;
+    transition: opacity 4s ease;
   }
   #blackout {
     position: fixed;
@@ -218,26 +262,48 @@
     transition: opacity 2s ease;
   }
   
-  /* Phase 8 Release Background */
+  /* Cockpit Background */
   #cockpitBg {
     position: fixed;
     inset: 0;
-    background-image: url('images/cockpit_ground.png'); /* Expecting existing file */
+    background-image: url('images/cockpit_ground.png');
     background-size: cover;
     background-position: center;
     opacity: 0;
     z-index: 1;
     transition: opacity 3s ease;
+    pointer-events: none;
   }
-  #finalControls {
+  
+  /* Final Button Container */
+  #finalBtnContainer {
     position: fixed;
-    bottom: 30px;
+    bottom: 50px;
     width: 100%;
     text-align: center;
     z-index: 20;
     opacity: 0;
-    transition: opacity 2s ease;
+    transition: opacity 3s ease;
+    pointer-events: none;
   }
+  .final-btn {
+    background: transparent;
+    border: 1px solid rgba(0, 242, 255, 0.3);
+    color: #00f2ff;
+    padding: 15px 40px;
+    font-size: 18px;
+    cursor: pointer;
+    font-family: inherit;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+    box-shadow: 0 0 10px rgba(0, 242, 255, 0.1);
+    transition: all 1s ease;
+  }
+  .final-btn:hover {
+    box-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
+    background: rgba(0, 242, 255, 0.05);
+  }
+
 </style>
 </head>
 <body>
@@ -263,17 +329,47 @@
 
   </div>
 
-  <div id="finalControls">
-    <button class="cinematic-btn visible" onclick="window.location.href='index.html'">RESTART SIMULATION</button>
+  <div id="finalBtnContainer">
+    <button class="final-btn" onclick="event.stopPropagation(); window.location.href='end.html'">WELCOME BACK TO 2026</button>
   </div>
 
+  <audio id="travelAudio" src="audio/travel.mp3" preload="auto"></audio>
+
   <script>
+    // --- MANDATORY FIX 1 & 5: DISABLE GESTURES & BACK NAV ---
+    history.pushState(null, "", location.href);
+    window.addEventListener("popstate", () => {
+      history.pushState(null, "", location.href);
+    });
+
+    window.addEventListener("touchstart", e => {
+      if (!e.target.closest("button")) {
+        e.preventDefault();
+      }
+    }, { passive: false });
+
+    window.addEventListener("touchend", e => {
+      if (!e.target.closest("button")) {
+        e.preventDefault();
+      }
+    }, { passive: false });
+
+    window.addEventListener("click", e => {
+      if (!e.target.closest("button")) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }, true);
+
+
     // --- SETUP & PARAMS ---
     const urlParams = new URLSearchParams(window.location.search);
-    // Determine timeline (default to past if null, for safety)
     const yearParam = urlParams.get('year');
     const year = yearParam ? parseInt(yearParam) : 1897;
     const isFuture = year > 2026;
+
+    // --- SAFETY LOCK VARIABLE ---
+    let interactionEnabled = false;
 
     // --- DOM ELEMENTS ---
     const body = document.body;
@@ -286,7 +382,8 @@
     const flashOverlay = document.getElementById('flashOverlay');
     const blackout = document.getElementById('blackout');
     const cockpitBg = document.getElementById('cockpitBg');
-    const finalControls = document.getElementById('finalControls');
+    const finalBtnContainer = document.getElementById('finalBtnContainer');
+    const travelAudio = document.getElementById('travelAudio');
 
     // Apply Cinematic Fonts
     if (isFuture) {
@@ -295,9 +392,10 @@
       body.classList.add('font-past');
     }
 
-    // --- AUDIO SYSTEM (Web Audio API - No External Files) ---
+    // --- AUDIO SYSTEM ---
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     let tickInterval;
+    let currentTickType = 'hostile';
 
     function playTick() {
       if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -308,25 +406,32 @@
       osc.connect(gainNode);
       gainNode.connect(audioCtx.destination);
       
-      // Synthesis logic for a metallic tick
-      osc.type = 'square'; 
-      osc.frequency.setValueAtTime(800, audioCtx.currentTime); // High tick
-      osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.05);
-      
-      gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime); // Quiet
-      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+      if (currentTickType === 'hostile') {
+        osc.type = 'square'; 
+        osc.frequency.setValueAtTime(800, audioCtx.currentTime); 
+        osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.05);
+        gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime); 
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+      } else {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.1);
+        gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+      }
       
       osc.start();
-      osc.stop(audioCtx.currentTime + 0.05);
+      osc.stop(audioCtx.currentTime + 0.2);
     }
 
     function startTicking(speed = 1000) {
+      stopTicking();
       playTick();
       tickInterval = setInterval(playTick, speed);
     }
     
     function stopTicking() {
-      clearInterval(tickInterval);
+      if (tickInterval) clearInterval(tickInterval);
     }
 
     // --- HELPER FUNCTIONS ---
@@ -341,16 +446,15 @@
       narrativeBox.innerHTML = '';
       timeDialogue.innerHTML = '';
       userActions.innerHTML = '';
+      userActions.style.pointerEvents = "none";
     }
 
     function addTextLine(text, container, delay = 0, isBold = false) {
       setTimeout(() => {
         const p = document.createElement('div');
         p.className = 'fade-line' + (isBold ? ' big-bold' : '');
-        p.innerHTML = text; // innerHTML allows <br>
+        p.innerHTML = text; 
         container.appendChild(p);
-        
-        // Trigger reflow
         void p.offsetWidth; 
         p.classList.add('visible');
       }, delay);
@@ -358,21 +462,31 @@
 
     function showButton(text, onClickDelay, callback) {
       setTimeout(() => {
+        userActions.style.pointerEvents = "auto";
+
         const btn = document.createElement('button');
         btn.className = 'cinematic-btn';
         btn.innerText = text;
-        btn.onclick = () => {
-          // Send animation
+        
+        interactionEnabled = true;
+
+        // MANDATORY FIX 4: BUTTONS MUST STOP PROPAGATION
+        btn.onclick = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+
+          if (!interactionEnabled) return;
+          interactionEnabled = false;
+
           btn.classList.remove('visible');
           btn.classList.add('sent-anim');
           setTimeout(() => {
             btn.remove();
+            userActions.style.pointerEvents = "none";
             if(callback) callback();
           }, 1000);
         };
         userActions.appendChild(btn);
-        
-        // Trigger reflow
         void btn.offsetWidth;
         btn.classList.add('visible');
       }, onClickDelay);
@@ -386,12 +500,10 @@
       setTimeout(() => label.style.opacity = 1, 100);
     }
 
-    function clockSpeak(linesArray, nextAction) {
-      // Clear previous dialogue text but keep label
+    function clockSpeak(linesArray, nextAction, isAuto = false) {
       const oldLines = timeDialogue.querySelectorAll('.fade-line');
       oldLines.forEach(l => l.remove());
       
-      // Show thinking dots
       const dots = document.createElement('div');
       dots.className = 'thinking';
       dots.innerText = '•••';
@@ -403,12 +515,15 @@
 
         let totalDelay = 0;
         linesArray.forEach((line, index) => {
-          addTextLine(line, timeDialogue, index * 1500);
-          totalDelay = (index * 1500) + 1500;
+          addTextLine(line, timeDialogue, index * 2000); 
+          totalDelay = (index * 2000);
         });
 
-        if(nextAction) setTimeout(nextAction, totalDelay);
-      }, 2000); // Thinking time
+        const buffer = isAuto ? 4000 : 300; 
+        
+        if(nextAction) setTimeout(nextAction, totalDelay + 1500 + buffer);
+
+      }, 2000); 
     }
 
     // --- STORY PHASES ---
@@ -434,9 +549,8 @@
         ];
       }
 
-      lines.forEach((line, i) => addTextLine(line, narrativeBox, i * 1200));
-
-      showButton("What? 😱", (lines.length * 1200) + 500, startPhase1);
+      lines.forEach((line, i) => addTextLine(line, narrativeBox, i * 1500));
+      showButton("What? 😱", (lines.length * 1500) + 1000, startPhase1);
     }
 
     // PHASE 1: VOID REVEAL
@@ -446,9 +560,8 @@
 
       const lines = ["YOU", "ARE", "STUCK", "HERE"];
       
-      lines.forEach((line, i) => addTextLine(line, narrativeBox, i * 800, true));
-
-      showButton("This wasn’t supposed to happen…", 4000, startPhase2);
+      lines.forEach((line, i) => addTextLine(line, narrativeBox, i * 1000, true));
+      showButton("This wasn’t supposed to happen…", 5000, startPhase2);
     }
 
     // PHASE 2: TIME ARRIVES
@@ -456,16 +569,14 @@
       flashScreen('black');
       clearNarrative();
       
-      // Show Clock
       clockContainer.style.display = 'flex';
-      // Reflow
       void clockContainer.offsetWidth;
       clockContainer.style.opacity = 1;
 
-      // Start Sound
-      startTicking(1000);
+      currentTickType = 'hostile';
+      clockBody.classList.add('shake');
+      startTicking(800); 
 
-      // Dialogue
       clockSpeak([
         "You humans are fascinating.",
         "You don’t just move through me.",
@@ -479,8 +590,7 @@
         "Tell me.",
         "Why did you break causality?"
       ], () => {
-        showButton("We were trying to understand the universe.", 500, () => {
-          // Response
+        showButton("We were trying to understand the universe.", 300, () => {
           clockSpeak([
             "Understanding without restraint is dangerous.",
             "Curiosity created fire.",
@@ -492,7 +602,6 @@
 
     // PHASE 4: REVEAL
     function startPhase4() {
-      // Intensify Glow slightly
       clockBody.style.boxShadow = "0 0 40px rgba(255, 0, 0, 0.9)";
       
       clockSpeak([
@@ -507,10 +616,8 @@
 
     // PHASE 5: HUMAN DEFENSE
     function startPhase5() {
-      showButton("We didn’t mean to damage anything.", 500, () => {
+      showButton("We didn’t mean to damage anything.", 300, () => {
         
-        // Clock Response
-        // Manually handling this one for the color shift mid-speech
         const oldLines = timeDialogue.querySelectorAll('.fade-line');
         oldLines.forEach(l => l.remove());
         
@@ -522,15 +629,15 @@
         setTimeout(() => {
           dots.remove();
           addTextLine("Intent does not erase consequence.", timeDialogue, 0);
-          addTextLine("But...", timeDialogue, 1500);
+          addTextLine("But...", timeDialogue, 2000);
           
           setTimeout(() => {
             addTextLine("Intent still matters.", timeDialogue, 0);
-            // COLOR SHIFT RED -> PURPLE
+            
             clockBody.classList.add('purple');
             
-            setTimeout(startPhase6, 3000);
-          }, 3000);
+            setTimeout(startPhase6, 5000);
+          }, 4000);
           
         }, 2000);
       });
@@ -538,6 +645,10 @@
 
     // PHASE 6: JUDGEMENT WITH HOPE
     function startPhase6() {
+      clockBody.classList.remove('shake');
+      currentTickType = 'calm';
+      startTicking(1000); 
+
       clockSpeak([
         "That brain of yours...",
         "It doesn’t belong here.",
@@ -545,57 +656,55 @@
         "In your original era.",
         "Make something better... instead of breaking me."
       ], () => {
-         // COLOR SHIFT PURPLE -> BLUE
          clockBody.classList.remove('purple');
          clockBody.classList.add('blue');
          
-         // Softer ticking
-         stopTicking();
-         startTicking(2000); // Slower, calmer
-         
-         setTimeout(startPhase7, 2000);
-      });
+         setTimeout(startPhase7Pre, 4000);
+      }, true); 
     }
 
-    // PHASE 7: CORRECTION
-    function startPhase7() {
-      const line = isFuture ? "You will move backward." : "You will move forward.";
-      
-      addTextLine(line, timeDialogue, 500);
-      
+    // PHASE 7 PRE: PAUSE
+    function startPhase7Pre() {
+      stopTicking();
       setTimeout(() => {
-        // SPIN FAST
-        stopTicking();
-        // Fast ticking sound simulation
-        tickInterval = setInterval(playTick, 100);
+        showButton("I understand. I won’t try to control you again.", 300, startPhase7Action);
+      }, 1000);
+    }
 
-        if(isFuture) {
-          clockBody.classList.add('spin-ccw'); // Backwards
-        } else {
-          clockBody.classList.add('spin-cw'); // Forwards
-        }
+    // PHASE 7 ACTION: SPIN
+    function startPhase7Action() {
+      if(isFuture) {
+        clockBody.classList.add('spin-ccw');
+      } else {
+        clockBody.classList.add('spin-cw');
+      }
 
-        setTimeout(startPhase8, 3000);
-      }, 2000);
+      travelAudio.currentTime = 0;
+      travelAudio.play().catch(e => console.log("Audio play error", e));
+
+      const line = isFuture ? "You will move backward." : "You will move forward.";
+      const oldLines = timeDialogue.querySelectorAll('.fade-line');
+      oldLines.forEach(l => l.remove());
+      addTextLine(line, timeDialogue, 0);
+
+      setTimeout(startPhase8, 3000);
     }
 
     // PHASE 8: RELEASE
     function startPhase8() {
-      clearInterval(tickInterval); // Stop sound
-      flashScreen('white'); // Big bright flash
+      travelAudio.pause();
       
-      // Hide stage elements
-      stage.style.opacity = 0;
+      flashOverlay.style.background = "linear-gradient(45deg, #ff0099, #493240, #00f2ff, #fff)";
+      flashOverlay.style.opacity = 1;
+      
+      stage.style.opacity = 0; 
       
       setTimeout(() => {
-        // Show Cockpit Background
-        cockpitBg.style.opacity = 1;
-        
-        // Show Final Controls
-        finalControls.style.opacity = 1;
-        
-        stage.style.display = 'none';
-      }, 1000);
+         flashOverlay.style.opacity = 0;
+         cockpitBg.style.opacity = 1;
+         finalBtnContainer.style.opacity = 1;
+         stage.style.display = 'none';
+      }, 4000);
     }
 
     // --- INIT ---
