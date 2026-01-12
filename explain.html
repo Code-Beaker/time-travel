@@ -2,102 +2,112 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>How did I reach here?</title>
+<title>Timeline Explanation</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-}
+*{margin:0;padding:0;box-sizing:border-box}
 
 body{
   min-height:100vh;
-  font-family: "Courier New", monospace;
-  color:white;
   background-size:cover;
   background-position:center;
-  background-attachment:fixed;
-  display:flex;
-  justify-content:center;
-  align-items:flex-start;
-  padding:60px 20px;
+  background-repeat:no-repeat;
+  color:white;
+  overflow-y:auto;
 }
 
+/* OVERLAY ONLY FOR READABILITY (NO BOXES) */
 #overlay{
-  background:rgba(0,0,0,0.65);
-  width:100%;
-  max-width:900px;
-  padding:50px 30px;
-  border-radius:20px;
+  min-height:100vh;
+  padding:60px 20px 120px;
+  background:rgba(0,0,0,0.45);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
 }
 
 /* TITLE */
 #title{
-  text-align:center;
-  font-size:42px;
-  opacity:0;
-  transition:opacity 2s ease;
-  margin-bottom:50px;
-}
-
-/* TIMELINE */
-.timeline{
-  display:flex;
-  flex-direction:column;
-  gap:25px;
-  font-size:18px;
-}
-
-.step{
+  font-size:52px;
+  font-weight:900;
+  margin-bottom:40px;
   opacity:0;
   transition:opacity 1.5s ease;
 }
 
-.arrow{
+/* TIMELINE */
+#timeline{
+  max-width:700px;
   text-align:center;
-  font-size:28px;
+  margin-bottom:40px;
+}
+
+.step{
+  font-size:22px;
+  margin:15px 0;
   opacity:0;
   transition:opacity 1s ease;
 }
 
-/* DESCRIPTION */
-#description{
-  margin-top:50px;
-  font-size:16px;
-  line-height:1.7;
-  opacity:0;
-  transition:opacity 2s ease;
-}
-
-/* BIG TEXT */
-#bigText{
-  margin-top:60px;
-  text-align:center;
+.arrow{
   font-size:36px;
-  letter-spacing:4px;
+  margin:5px 0;
+  opacity:0;
+  transition:opacity 1s ease;
+}
+
+/* EXPLANATION */
+#explanation{
+  max-width:800px;
+  font-size:18px;
+  line-height:1.7;
+  margin-top:30px;
   opacity:0;
   transition:opacity 2s ease;
 }
 
-/* BUTTON */
-#skyBtn{
-  margin:50px auto 0;
-  display:block;
-  padding:16px 32px;
-  font-size:18px;
-  background:transparent;
-  border:2px solid white;
-  color:white;
-  border-radius:40px;
-  cursor:pointer;
+/* FINAL TEXT */
+#finalText{
+  margin-top:60px;
+  font-size:46px;
+  font-weight:900;
   opacity:0;
-  transition:opacity 2s ease, box-shadow .3s ease;
+  transition:opacity 2s ease;
 }
 
+/* SKY BUTTON */
+#skyBtn{
+  margin-top:30px;
+  padding:14px 30px;
+  font-size:18px;
+  border:2px solid white;
+  background:transparent;
+  color:white;
+  cursor:pointer;
+  border-radius:30px;
+  opacity:0;
+  transition:opacity 1.5s ease, box-shadow .3s ease;
+}
 #skyBtn:hover{
   box-shadow:0 0 20px white;
+}
+
+/* FONT THEMES */
+.past-font{
+  font-family: "Times New Roman", serif;
+  color:#e6c48a;
+}
+
+.future-font{
+  font-family: "Courier New", monospace;
+  color:#00f2ff;
+}
+
+.ultra-future-font{
+  font-family: Arial, sans-serif;
+  letter-spacing:6px;
+  color:#ff00ff;
 }
 </style>
 </head>
@@ -107,109 +117,100 @@ body{
 
   <div id="title">How did I reach here? 🤔</div>
 
-  <div class="timeline">
-    <div class="step" id="s1"></div>
-    <div class="arrow" id="a1">↓</div>
+  <div id="timeline"></div>
 
-    <div class="step" id="s2"></div>
-    <div class="arrow" id="a2">→</div>
+  <div id="explanation"></div>
 
-    <div class="step" id="s3"></div>
-  </div>
+  <div id="finalText"></div>
 
-  <div id="description"></div>
-
-  <div id="bigText"></div>
-
-  <button id="skyBtn">Explore the night sky ✨</button>
+  <button id="skyBtn">Explore the sky ✨</button>
 
 </div>
 
 <script>
 const params = new URLSearchParams(window.location.search);
-const year = params.get("year");
+const year = parseInt(params.get("year"));
 
-/* ---------------- BACKGROUND ---------------- */
-if(year == 1897) document.body.style.backgroundImage = "url('images/past_1897.jpg')";
-else if(year == 1987) document.body.style.backgroundImage = "url('images/past_1987.jpg')";
-else if(year == 2050) document.body.style.backgroundImage = "url('images/future_2050.jpg')";
-else if(year == 3079) document.body.style.backgroundImage = "url('images/future_3079.jpg')";
+const title = document.getElementById("title");
+const timeline = document.getElementById("timeline");
+const explanation = document.getElementById("explanation");
+const finalText = document.getElementById("finalText");
+const skyBtn = document.getElementById("skyBtn");
 
-/* ---------------- CONTENT ---------------- */
-let steps = [];
-let description = "";
-let bigText = "";
-
-if(year < 2000){
-  // PAST
-  steps = [
-    "We launched from Earth aboard an experimental spacecraft.",
-    "We travelled through space and entered a naturally occurring wormhole located millions of kilometers away.",
-    "After passing through the wormhole, we emerged in this past timeline."
-  ];
-
-  description = `
-A wormhole is a theoretical shortcut through spacetime predicted by Einstein’s theory of General Relativity.
-By bending space and time into a tunnel-like structure, it allows two distant points in time to connect.
-Extreme gravity, time dilation, and relativistic effects make such travel unstable — but possible in theory.
-The journey does not violate physics; it exploits it.
-  `;
-
-  bigText = "WELCOME TO THE PAST";
+/* BACKGROUND + THEME */
+if(year === 1897){
+  document.body.style.backgroundImage = "url('images/past_1897.jpg')";
+  document.body.classList.add("past-font");
+  finalText.innerText = "Welcome to the past";
+}
+else if(year === 1987){
+  document.body.style.backgroundImage = "url('images/past_1987.jpg')";
+  document.body.classList.add("past-font");
+  finalText.innerText = "Welcome to the past";
+}
+else if(year === 2050){
+  document.body.style.backgroundImage = "url('images/future_2050.jpg')";
+  document.body.classList.add("future-font");
+  finalText.innerText = "Welcome to the future";
 }
 else{
-  // FUTURE
-  steps = [
-    "We departed Earth using a relativistic spacecraft.",
-    "We performed a gravitational slingshot maneuver around a black hole.",
-    "Time dilation shifted us forward, delivering us into the future."
-  ];
-
-  description = `
-Near a black hole, gravity becomes so intense that time itself slows down.
-While years pass elsewhere, only moments pass for the traveler.
-Using relativistic speeds and gravitational time dilation, reaching the future requires no paradox — only patience and precision.
-  `;
-
-  bigText = "WELCOME TO THE FUTURE";
+  document.body.style.backgroundImage = "url('images/future_3079.jpg')";
+  document.body.classList.add("ultra-future-font");
+  finalText.innerText = "Welcome to the future";
 }
 
-/* ---------------- ANIMATION SEQUENCE ---------------- */
-const title = document.getElementById("title");
-const s1 = document.getElementById("s1");
-const s2 = document.getElementById("s2");
-const s3 = document.getElementById("s3");
-const a1 = document.getElementById("a1");
-const a2 = document.getElementById("a2");
-const desc = document.getElementById("description");
-const big = document.getElementById("bigText");
-const btn = document.getElementById("skyBtn");
+/* TITLE FADE */
+setTimeout(()=> title.style.opacity = 1, 300);
 
-s1.innerText = steps[0];
-s2.innerText = steps[1];
-s3.innerText = steps[2];
-desc.innerText = description;
-big.innerText = bigText;
+/* TIMELINE STEPS (ALL ↓) */
+const steps = (year < 2000)
+? [
+  "We launched from Earth in an experimental spacecraft.",
+  "We travelled through deep space and entered a naturally occurring wormhole.",
+  "The wormhole distorted space-time and placed us in this era."
+]
+: [
+  "We launched from Earth using relativistic propulsion.",
+  "A controlled black hole slingshot bent space-time.",
+  "Extreme time dilation carried us into the future."
+];
 
-setTimeout(()=> title.style.opacity = 1, 500);
+let delay = 1200;
 
-setTimeout(()=> s1.style.opacity = 1, 2500);
-setTimeout(()=> a1.style.opacity = 1, 4000);
+steps.forEach((text, i)=>{
+  const step = document.createElement("div");
+  step.className = "step";
+  step.innerText = text;
+  timeline.appendChild(step);
 
-setTimeout(()=> s2.style.opacity = 1, 5200);
-setTimeout(()=> a2.style.opacity = 1, 6700);
+  setTimeout(()=> step.style.opacity = 1, delay);
+  delay += 1200;
 
-setTimeout(()=> s3.style.opacity = 1, 8000);
+  if(i < steps.length-1){
+    const arrow = document.createElement("div");
+    arrow.className = "arrow";
+    arrow.innerText = "↓";
+    timeline.appendChild(arrow);
 
-setTimeout(()=> desc.style.opacity = 1, 10000);
-setTimeout(()=> big.style.opacity = 1, 12500);
-setTimeout(()=> btn.style.opacity = 1, 14500);
+    setTimeout(()=> arrow.style.opacity = 1, delay);
+    delay += 800;
+  }
+});
 
-/* SKY BUTTON (placeholder) */
-btn.onclick = () => {
-  alert("Night sky simulation coming next 🌌");
-};
+/* EXPLANATION */
+setTimeout(()=>{
+  explanation.style.opacity = 1;
+  explanation.innerText = (year < 2000)
+  ? "A wormhole is a theoretical tunnel in space-time predicted by general relativity. Under extreme gravitational conditions, space and time can bend, allowing two distant points — or different eras — to connect through a temporary tear in the fabric of the universe."
+  : "A black hole’s immense gravity bends space and time to such extremes that time slows dramatically. By performing a precise gravitational slingshot near its event horizon, massive time dilation occurs, allowing forward travel into the future without violating known physical laws.";
+}, delay + 800);
+
+/* FINAL TEXT + BUTTON */
+setTimeout(()=>{
+  finalText.style.opacity = 1;
+  skyBtn.style.opacity = 1;
+}, delay + 2600);
+
 </script>
-
 </body>
 </html>
