@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Time Consequence</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  /* --- CORE LAYOUT --- */
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: #000;
+    color: #fff;
+    font-family: 'Courier New', Courier, monospace; /* Default fallback */
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    user-select: none;
+  }
+
+  /* --- FONTS & TYPOGRAPHY --- */
+  /* Class applied via JS based on timeline */
+  .font-past {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    letter-spacing: 1px;
+  }
+  .font-future {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+
+  /* --- CONTAINERS --- */
+  #stage {
+    text-align: center;
+    width: 90%;
+    max-width: 800px;
+    position: relative;
+    z-index: 10;
+  }
+
+  /* --- TEXT FADES --- */
+  .fade-line {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 1.5s ease, transform 1.5s ease;
+    margin-bottom: 20px;
+    font-size: 24px;
+    line-height: 1.5;
+    text-shadow: 0 0 10px rgba(255,255,255,0.3);
+  }
+  .fade-line.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .fade-line.big-bold {
+    font-size: 48px;
+    font-weight: 900;
+    letter-spacing: 5px;
+    color: #ddd;
+  }
+
+  /* --- BUTTONS --- */
+  .cinematic-btn {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.4);
+    color: rgba(255,255,255,0.8);
+    padding: 15px 30px;
+    font-size: 18px;
+    margin-top: 40px;
+    cursor: pointer;
+    opacity: 0;
+    transition: all 0.8s ease;
+    font-family: inherit;
+    letter-spacing: 2px;
+  }
+  .cinematic-btn:hover {
+    border-color: #fff;
+    color: #fff;
+    box-shadow: 0 0 15px rgba(255,255,255,0.5);
+  }
+  .cinematic-btn.visible {
+    opacity: 1;
+  }
+  
+  /* User Sent Message Animation */
+  .sent-anim {
+    animation: slideUpFade 1s forwards;
+  }
+  @keyframes slideUpFade {
+    0% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-30px); }
+  }
+
+  /* --- THE CLOCK --- */
+  #clockContainer {
+    display: none; /* Hidden initially */
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 30px;
+    transition: opacity 2s ease;
+    opacity: 0;
+  }
+  #clockBody {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #2a2a2a, #000);
+    border: 4px solid #ff0000;
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.6);
+    position: relative;
+    transition: border-color 3s ease, box-shadow 3s ease;
+  }
+  
+  /* Clock Hands */
+  .hand {
+    position: absolute;
+    bottom: 50%;
+    left: 50%;
+    background: #fff;
+    transform-origin: bottom center;
+    border-radius: 2px;
+    opacity: 0.8;
+  }
+  .hour-hand {
+    width: 4px;
+    height: 50px;
+    transform: translateX(-50%) rotate(45deg);
+  }
+  .minute-hand {
+    width: 2px;
+    height: 70px;
+    transform: translateX(-50%) rotate(180deg);
+  }
+  .center-dot {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 10px; height: 10px;
+    background: #fff;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 5px #fff;
+  }
+
+  /* Clock Colors */
+  #clockBody.purple {
+    border-color: #a020f0;
+    box-shadow: 0 0 30px rgba(160, 32, 240, 0.7);
+  }
+  #clockBody.blue {
+    border-color: #00f2ff;
+    box-shadow: 0 0 40px rgba(0, 242, 255, 0.8);
+  }
+
+  /* Clock Spin Animations */
+  .spin-cw {
+    animation: spinClock 2s linear infinite;
+  }
+  .spin-ccw {
+    animation: spinClockCCW 2s linear infinite;
+  }
+
+  @keyframes spinClock {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  @keyframes spinClockCCW {
+    0% { transform: rotate(360deg); }
+    100% { transform: rotate(0deg); }
+  }
+
+  /* Dialogue Box for Time */
+  #timeDialogue {
+    min-height: 120px;
+    margin-top: 20px;
+  }
+  .speaker-label {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 10px;
+    opacity: 0;
+    transition: opacity 1s;
+  }
+
+  /* Thinking Dots */
+  .thinking {
+    font-size: 30px;
+    letter-spacing: 5px;
+    animation: pulse 1.5s infinite;
+    color: #888;
+  }
+  @keyframes pulse {
+    0% { opacity: 0.3; }
+    50% { opacity: 1; }
+    100% { opacity: 0.3; }
+  }
+
+  /* --- FULL SCREEN FX --- */
+  #flashOverlay {
+    position: fixed;
+    inset: 0;
+    background: white;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 100;
+    transition: opacity 0.2s ease;
+  }
+  #blackout {
+    position: fixed;
+    inset: 0;
+    background: black;
+    z-index: 99;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 2s ease;
+  }
+  
+  /* Phase 8 Release Background */
+  #cockpitBg {
+    position: fixed;
+    inset: 0;
+    background-image: url('images/cockpit_ground.png'); /* Expecting existing file */
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    z-index: 1;
+    transition: opacity 3s ease;
+  }
+  #finalControls {
+    position: fixed;
+    bottom: 30px;
+    width: 100%;
+    text-align: center;
+    z-index: 20;
+    opacity: 0;
+    transition: opacity 2s ease;
+  }
+</style>
+</head>
+<body>
+
+  <div id="flashOverlay"></div>
+  <div id="blackout"></div>
+  <div id="cockpitBg"></div>
+
+  <div id="stage">
+    
+    <div id="narrativeBox"></div>
+
+    <div id="clockContainer">
+      <div id="clockBody">
+        <div class="hand hour-hand"></div>
+        <div class="hand minute-hand"></div>
+        <div class="center-dot"></div>
+      </div>
+      <div id="timeDialogue"></div>
+    </div>
+
+    <div id="userActions"></div>
+
+  </div>
+
+  <div id="finalControls">
+    <button class="cinematic-btn visible" onclick="window.location.href='index.html'">RESTART SIMULATION</button>
+  </div>
+
+  <script>
+    // --- SETUP & PARAMS ---
+    const urlParams = new URLSearchParams(window.location.search);
+    // Determine timeline (default to past if null, for safety)
+    const yearParam = urlParams.get('year');
+    const year = yearParam ? parseInt(yearParam) : 1897;
+    const isFuture = year > 2026;
+
+    // --- DOM ELEMENTS ---
+    const body = document.body;
+    const stage = document.getElementById('stage');
+    const narrativeBox = document.getElementById('narrativeBox');
+    const clockContainer = document.getElementById('clockContainer');
+    const clockBody = document.getElementById('clockBody');
+    const timeDialogue = document.getElementById('timeDialogue');
+    const userActions = document.getElementById('userActions');
+    const flashOverlay = document.getElementById('flashOverlay');
+    const blackout = document.getElementById('blackout');
+    const cockpitBg = document.getElementById('cockpitBg');
+    const finalControls = document.getElementById('finalControls');
+
+    // Apply Cinematic Fonts
+    if (isFuture) {
+      body.classList.add('font-future');
+    } else {
+      body.classList.add('font-past');
+    }
+
+    // --- AUDIO SYSTEM (Web Audio API - No External Files) ---
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let tickInterval;
+
+    function playTick() {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      
+      const osc = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      
+      osc.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+      
+      // Synthesis logic for a metallic tick
+      osc.type = 'square'; 
+      osc.frequency.setValueAtTime(800, audioCtx.currentTime); // High tick
+      osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.05);
+      
+      gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime); // Quiet
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+      
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.05);
+    }
+
+    function startTicking(speed = 1000) {
+      playTick();
+      tickInterval = setInterval(playTick, speed);
+    }
+    
+    function stopTicking() {
+      clearInterval(tickInterval);
+    }
+
+    // --- HELPER FUNCTIONS ---
+
+    function flashScreen(color = 'white') {
+      flashOverlay.style.background = color;
+      flashOverlay.style.opacity = 1;
+      setTimeout(() => { flashOverlay.style.opacity = 0; }, 200);
+    }
+
+    function clearNarrative() {
+      narrativeBox.innerHTML = '';
+      timeDialogue.innerHTML = '';
+      userActions.innerHTML = '';
+    }
+
+    function addTextLine(text, container, delay = 0, isBold = false) {
+      setTimeout(() => {
+        const p = document.createElement('div');
+        p.className = 'fade-line' + (isBold ? ' big-bold' : '');
+        p.innerHTML = text; // innerHTML allows <br>
+        container.appendChild(p);
+        
+        // Trigger reflow
+        void p.offsetWidth; 
+        p.classList.add('visible');
+      }, delay);
+    }
+
+    function showButton(text, onClickDelay, callback) {
+      setTimeout(() => {
+        const btn = document.createElement('button');
+        btn.className = 'cinematic-btn';
+        btn.innerText = text;
+        btn.onclick = () => {
+          // Send animation
+          btn.classList.remove('visible');
+          btn.classList.add('sent-anim');
+          setTimeout(() => {
+            btn.remove();
+            if(callback) callback();
+          }, 1000);
+        };
+        userActions.appendChild(btn);
+        
+        // Trigger reflow
+        void btn.offsetWidth;
+        btn.classList.add('visible');
+      }, onClickDelay);
+    }
+
+    function showSpeakerLabel() {
+      const label = document.createElement('div');
+      label.className = 'speaker-label';
+      label.innerText = 'ENTITY: TIME';
+      timeDialogue.appendChild(label);
+      setTimeout(() => label.style.opacity = 1, 100);
+    }
+
+    function clockSpeak(linesArray, nextAction) {
+      // Clear previous dialogue text but keep label
+      const oldLines = timeDialogue.querySelectorAll('.fade-line');
+      oldLines.forEach(l => l.remove());
+      
+      // Show thinking dots
+      const dots = document.createElement('div');
+      dots.className = 'thinking';
+      dots.innerText = '•••';
+      timeDialogue.appendChild(dots);
+
+      setTimeout(() => {
+        dots.remove();
+        if(!timeDialogue.querySelector('.speaker-label')) showSpeakerLabel();
+
+        let totalDelay = 0;
+        linesArray.forEach((line, index) => {
+          addTextLine(line, timeDialogue, index * 1500);
+          totalDelay = (index * 1500) + 1500;
+        });
+
+        if(nextAction) setTimeout(nextAction, totalDelay);
+      }, 2000); // Thinking time
+    }
+
+    // --- STORY PHASES ---
+
+    // PHASE 0: THE JOKE
+    function startPhase0() {
+      let lines = [];
+      if (isFuture) {
+        lines = [
+          "Return?",
+          "Nice joke.",
+          "You burned most of your fuel escaping a black hole’s gravity.",
+          "One wrong move and you’d be spaghettified.",
+          "That monster is far beyond reach now."
+        ];
+      } else {
+        lines = [
+          "Return?",
+          "Nice joke.",
+          "You drifted through a wormhole for hours to reach the past.",
+          "That tear in space is light-years away now.",
+          "There is no road back."
+        ];
+      }
+
+      lines.forEach((line, i) => addTextLine(line, narrativeBox, i * 1200));
+
+      showButton("What? 😱", (lines.length * 1200) + 500, startPhase1);
+    }
+
+    // PHASE 1: VOID REVEAL
+    function startPhase1() {
+      flashScreen('black');
+      clearNarrative();
+
+      const lines = ["YOU", "ARE", "STUCK", "HERE"];
+      
+      lines.forEach((line, i) => addTextLine(line, narrativeBox, i * 800, true));
+
+      showButton("This wasn’t supposed to happen…", 4000, startPhase2);
+    }
+
+    // PHASE 2: TIME ARRIVES
+    function startPhase2() {
+      flashScreen('black');
+      clearNarrative();
+      
+      // Show Clock
+      clockContainer.style.display = 'flex';
+      // Reflow
+      void clockContainer.offsetWidth;
+      clockContainer.style.opacity = 1;
+
+      // Start Sound
+      startTicking(1000);
+
+      // Dialogue
+      clockSpeak([
+        "You humans are fascinating.",
+        "You don’t just move through me.",
+        "You touch me."
+      ], startPhase3);
+    }
+
+    // PHASE 3: ACTIVE CONVERSATION
+    function startPhase3() {
+      clockSpeak([
+        "Tell me.",
+        "Why did you break causality?"
+      ], () => {
+        showButton("We were trying to understand the universe.", 500, () => {
+          // Response
+          clockSpeak([
+            "Understanding without restraint is dangerous.",
+            "Curiosity created fire.",
+            "It also created extinction."
+          ], startPhase4);
+        });
+      });
+    }
+
+    // PHASE 4: REVEAL
+    function startPhase4() {
+      // Intensify Glow slightly
+      clockBody.style.boxShadow = "0 0 40px rgba(255, 0, 0, 0.9)";
+      
+      clockSpeak([
+        "You bent relativity.",
+        "You slipped through wormholes and black holes.",
+        "You didn’t just travel...",
+        "You manipulated me.",
+        "I am not a place.",
+        "I am the fourth dimension."
+      ], startPhase5);
+    }
+
+    // PHASE 5: HUMAN DEFENSE
+    function startPhase5() {
+      showButton("We didn’t mean to damage anything.", 500, () => {
+        
+        // Clock Response
+        // Manually handling this one for the color shift mid-speech
+        const oldLines = timeDialogue.querySelectorAll('.fade-line');
+        oldLines.forEach(l => l.remove());
+        
+        const dots = document.createElement('div');
+        dots.className = 'thinking';
+        dots.innerText = '•••';
+        timeDialogue.appendChild(dots);
+
+        setTimeout(() => {
+          dots.remove();
+          addTextLine("Intent does not erase consequence.", timeDialogue, 0);
+          addTextLine("But...", timeDialogue, 1500);
+          
+          setTimeout(() => {
+            addTextLine("Intent still matters.", timeDialogue, 0);
+            // COLOR SHIFT RED -> PURPLE
+            clockBody.classList.add('purple');
+            
+            setTimeout(startPhase6, 3000);
+          }, 3000);
+          
+        }, 2000);
+      });
+    }
+
+    // PHASE 6: JUDGEMENT WITH HOPE
+    function startPhase6() {
+      clockSpeak([
+        "That brain of yours...",
+        "It doesn’t belong here.",
+        "Use it where it started.",
+        "In your original era.",
+        "Make something better... instead of breaking me."
+      ], () => {
+         // COLOR SHIFT PURPLE -> BLUE
+         clockBody.classList.remove('purple');
+         clockBody.classList.add('blue');
+         
+         // Softer ticking
+         stopTicking();
+         startTicking(2000); // Slower, calmer
+         
+         setTimeout(startPhase7, 2000);
+      });
+    }
+
+    // PHASE 7: CORRECTION
+    function startPhase7() {
+      const line = isFuture ? "You will move backward." : "You will move forward.";
+      
+      addTextLine(line, timeDialogue, 500);
+      
+      setTimeout(() => {
+        // SPIN FAST
+        stopTicking();
+        // Fast ticking sound simulation
+        tickInterval = setInterval(playTick, 100);
+
+        if(isFuture) {
+          clockBody.classList.add('spin-ccw'); // Backwards
+        } else {
+          clockBody.classList.add('spin-cw'); // Forwards
+        }
+
+        setTimeout(startPhase8, 3000);
+      }, 2000);
+    }
+
+    // PHASE 8: RELEASE
+    function startPhase8() {
+      clearInterval(tickInterval); // Stop sound
+      flashScreen('white'); // Big bright flash
+      
+      // Hide stage elements
+      stage.style.opacity = 0;
+      
+      setTimeout(() => {
+        // Show Cockpit Background
+        cockpitBg.style.opacity = 1;
+        
+        // Show Final Controls
+        finalControls.style.opacity = 1;
+        
+        stage.style.display = 'none';
+      }, 1000);
+    }
+
+    // --- INIT ---
+    window.onload = () => {
+      setTimeout(startPhase0, 1000);
+    };
+
+  </script>
+</body>
+</html>
