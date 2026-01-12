@@ -5,31 +5,42 @@
 <title>Time Consequence</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-  /* --- FIX 1: REMOVE ANDROID HIGHLIGHT GLOBALLY --- */
+  /* --- REMOVE ANDROID HIGHLIGHT GLOBALLY --- */
   * { 
     -webkit-tap-highlight-color: transparent; 
+    box-sizing: border-box;
   }
 
-  /* --- MANDATORY FIX 2: POINTER EVENTS LOCKDOWN --- */
+  /* --- CORE LAYOUT & SCROLLING FIX --- */
   body {
     margin: 0;
     padding: 0;
     background-color: #000;
     color: #fff;
     font-family: 'Courier New', Courier, monospace;
-    overflow-y: auto;
+    
+    /* ENABLE SCROLLING */
+    overflow-y: auto; 
     overflow-x: hidden; 
+    
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    
+    /* START CONTENT AT TOP TO PREVENT CLIPPING */
+    justify-content: flex-start; 
+    
     min-height: 100vh;
+    min-height: 100dvh; 
+    
     user-select: none;
-    /* GLOBAL LOCK */
-    pointer-events: none;
+    
+    /* Enable pointer events for scrolling */
+    pointer-events: auto; 
+    touch-action: pan-y;
   }
 
-  /* --- MANDATORY FIX 2 & 3: CONTAINER SAFETY --- */
+  /* --- CONTAINER SAFETY --- */
   #stage,
   #narrativeBox,
   #timeDialogue,
@@ -60,7 +71,8 @@
     max-width: 800px;
     position: relative;
     z-index: 10;
-    padding: 50px 0;
+    padding-top: 80px; 
+    padding-bottom: 150px; 
   }
 
   /* --- TEXT FADES --- */
@@ -72,6 +84,7 @@
     font-size: 24px;
     line-height: 1.5;
     text-shadow: 0 0 10px rgba(255,255,255,0.3);
+    will-change: opacity, transform;
   }
   .fade-line.visible {
     opacity: 1;
@@ -85,9 +98,9 @@
   }
 
   /* --- BUTTONS --- */
-  /* MANDATORY FIX 2: RE-ENABLE BUTTONS */
   button, .cinematic-btn, .final-btn {
     pointer-events: auto;
+    touch-action: manipulation;
   }
 
   .cinematic-btn {
@@ -102,6 +115,7 @@
     transition: all 0.8s ease;
     font-family: inherit;
     letter-spacing: 2px;
+    min-height: 44px; 
   }
   .cinematic-btn:hover {
     border-color: #fff;
@@ -139,9 +153,10 @@
     box-shadow: 0 0 20px rgba(255, 0, 0, 0.6);
     position: relative;
     transition: border-color 3s ease, box-shadow 3s ease;
+    transform-style: preserve-3d;
   }
 
-  /* SHAKE ANIMATION */
+  /* SHAKE ANIMATIONS */
   @keyframes shake {
     0% { transform: translate(1px, 1px) rotate(0deg); }
     10% { transform: translate(-1px, -2px) rotate(-1deg); }
@@ -155,11 +170,16 @@
     90% { transform: translate(1px, 2px) rotate(0deg); }
     100% { transform: translate(1px, -2px) rotate(-1deg); }
   }
-  .shake {
-    animation: shake 0.5s infinite;
+  @keyframes shakeMild {
+    0% { transform: translate(0.5px, 0.5px); }
+    50% { transform: translate(-0.5px, -0.5px); }
+    100% { transform: translate(0.5px, -0.5px); }
   }
+
+  .shake { animation: shake 0.5s infinite; }
+  .shake-mild { animation: shakeMild 0.5s infinite; }
   
-  /* Clock Hands */
+  /* CLOCK HANDS */
   .hand {
     position: absolute;
     bottom: 50%;
@@ -168,141 +188,72 @@
     transform-origin: bottom center;
     border-radius: 2px;
     opacity: 0.8;
+    backface-visibility: hidden;
   }
-  .hour-hand {
-    width: 4px;
-    height: 50px;
-    transform: translateX(-50%) rotate(45deg);
-  }
-  .minute-hand {
-    width: 2px;
-    height: 70px;
-    transform: translateX(-50%) rotate(180deg);
+  .hour-hand { width: 6px; height: 50px; transform: translateX(-50%) rotate(45deg); z-index: 4; }
+  .minute-hand { width: 4px; height: 70px; transform: translateX(-50%) rotate(180deg); z-index: 5; }
+  .second-hand { 
+    width: 2px; height: 85px; background: #ff0000; 
+    transform: translateX(-50%) rotate(0deg); opacity: 1; z-index: 6; 
+    transition: transform 0.1s cubic-bezier(0.4, 2.08, 0.55, 0.44); 
   }
   .center-dot {
-    position: absolute;
-    top: 50%; left: 50%;
-    width: 10px; height: 10px;
-    background: #fff;
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    box-shadow: 0 0 5px #fff;
+    position: absolute; top: 50%; left: 50%; width: 12px; height: 12px;
+    background: #fff; border-radius: 50%; transform: translate(-50%, -50%);
+    box-shadow: 0 0 5px #fff; z-index: 7;
   }
 
-  /* Clock Colors */
-  #clockBody.purple {
-    border-color: #a020f0;
-    box-shadow: 0 0 30px rgba(160, 32, 240, 0.7);
-  }
-  #clockBody.blue {
-    border-color: #00f2ff;
-    box-shadow: 0 0 40px rgba(0, 242, 255, 0.8);
-  }
+  /* COLORS */
+  #clockBody.purple { border-color: #a020f0; box-shadow: 0 0 30px rgba(160, 32, 240, 0.7); }
+  #clockBody.blue { border-color: #00f2ff; box-shadow: 0 0 40px rgba(0, 242, 255, 0.8); }
 
-  /* Clock Spin Animations */
-  .spin-cw {
-    animation: spinClock 0.2s linear infinite;
-  }
-  .spin-ccw {
-    animation: spinClockCCW 0.2s linear infinite;
-  }
+  /* CINEMATIC SPINS */
+  .spin-cw { animation: spinClock 6s ease-in-out forwards; }
+  .spin-ccw { animation: spinClockCCW 6s ease-in-out forwards; }
+  .spin-hand-fast { animation: spinHandFast 6s ease-in-out forwards; }
+  .spin-hand-medium { animation: spinHandMedium 6s ease-in-out forwards; }
+  .spin-hand-slow { animation: spinHandSlow 6s ease-in-out forwards; }
+  .spin-hand-fast-rev { animation: spinHandFastRev 6s ease-in-out forwards; }
+  .spin-hand-medium-rev { animation: spinHandMediumRev 6s ease-in-out forwards; }
+  .spin-hand-slow-rev { animation: spinHandSlowRev 6s ease-in-out forwards; }
 
-  @keyframes spinClock {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-  @keyframes spinClockCCW {
-    0% { transform: rotate(360deg); }
-    100% { transform: rotate(0deg); }
-  }
+  @keyframes spinClock { 0% { transform: rotate(0deg); } 100% { transform: rotate(1080deg); } }
+  @keyframes spinClockCCW { 0% { transform: rotate(0deg); } 100% { transform: rotate(-1080deg); } }
+  @keyframes spinHandFast { 0% { transform: translateX(-50%) rotate(0deg); } 100% { transform: translateX(-50%) rotate(3600deg); } }
+  @keyframes spinHandFastRev { 0% { transform: translateX(-50%) rotate(0deg); } 100% { transform: translateX(-50%) rotate(-3600deg); } }
+  @keyframes spinHandMedium { 0% { transform: translateX(-50%) rotate(180deg); } 100% { transform: translateX(-50%) rotate(1440deg); } }
+  @keyframes spinHandMediumRev { 0% { transform: translateX(-50%) rotate(180deg); } 100% { transform: translateX(-50%) rotate(-1080deg); } }
+  @keyframes spinHandSlow { 0% { transform: translateX(-50%) rotate(45deg); } 100% { transform: translateX(-50%) rotate(405deg); } }
+  @keyframes spinHandSlowRev { 0% { transform: translateX(-50%) rotate(45deg); } 100% { transform: translateX(-50%) rotate(-315deg); } }
 
-  /* Dialogue Box */
-  #timeDialogue {
-    min-height: 120px;
-    margin-top: 20px;
-  }
-  .speaker-label {
-    font-size: 14px;
-    color: #666;
-    margin-bottom: 10px;
-    opacity: 0;
-    transition: opacity 1s;
-  }
+  /* DIALOGUE & FX */
+  #timeDialogue { min-height: 120px; margin-top: 20px; }
+  .speaker-label { font-size: 14px; color: #666; margin-bottom: 10px; opacity: 0; transition: opacity 1s; }
+  .thinking { font-size: 30px; letter-spacing: 5px; animation: pulse 1.5s infinite; color: #888; }
+  @keyframes pulse { 0% { opacity: 0.3; } 50% { opacity: 1; } 100% { opacity: 0.3; } }
 
-  /* Thinking Dots */
-  .thinking {
-    font-size: 30px;
-    letter-spacing: 5px;
-    animation: pulse 1.5s infinite;
-    color: #888;
-  }
-  @keyframes pulse {
-    0% { opacity: 0.3; }
-    50% { opacity: 1; }
-    100% { opacity: 0.3; }
-  }
-
-  /* --- FULL SCREEN FX --- */
-  #flashOverlay {
-    position: fixed;
-    inset: 0;
-    background: white;
-    opacity: 0;
-    pointer-events: none;
-    z-index: 100;
-    transition: opacity 4s ease;
-  }
-  #blackout {
-    position: fixed;
-    inset: 0;
-    background: black;
-    z-index: 99;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 2s ease;
+  /* OVERLAYS */
+  #flashOverlay { position: fixed; inset: 0; background: white; opacity: 0; pointer-events: none; z-index: 100; transition: opacity 4s ease; }
+  #blackout { position: fixed; inset: 0; background: black; z-index: 99; opacity: 0; pointer-events: none; transition: opacity 2s ease; }
+  
+  #cockpitBg { 
+    position: fixed; inset: 0; background-image: url('images/cockpit_ground.png');
+    background-size: cover; background-position: center; opacity: 0; z-index: 1;
+    transition: opacity 3s ease; pointer-events: none; 
   }
   
-  /* Cockpit Background */
-  #cockpitBg {
-    position: fixed;
-    inset: 0;
-    background-image: url('images/cockpit_ground.png');
-    background-size: cover;
-    background-position: center;
-    opacity: 0;
-    z-index: 1;
-    transition: opacity 3s ease;
-    pointer-events: none;
-  }
-  
-  /* Final Button Container */
   #finalBtnContainer {
-    position: fixed;
-    bottom: 50px;
-    width: 100%;
-    text-align: center;
-    z-index: 20;
-    opacity: 0;
-    transition: opacity 3s ease;
-    pointer-events: none;
+    position: fixed; bottom: 50px; width: 100%; text-align: center;
+    z-index: 20; opacity: 0; transition: opacity 3s ease; display: none; 
   }
+  
   .final-btn {
-    background: transparent;
-    border: 1px solid rgba(0, 242, 255, 0.3);
-    color: #00f2ff;
-    padding: 15px 40px;
-    font-size: 18px;
-    cursor: pointer;
-    font-family: inherit;
-    letter-spacing: 2px;
-    text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
-    box-shadow: 0 0 10px rgba(0, 242, 255, 0.1);
-    transition: all 1s ease;
+    background: transparent; border: 1px solid rgba(0, 242, 255, 0.3); color: #00f2ff;
+    padding: 15px 40px; font-size: 18px; cursor: pointer; font-family: inherit;
+    letter-spacing: 2px; text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+    box-shadow: 0 0 10px rgba(0, 242, 255, 0.1); transition: all 1s ease;
   }
-  .final-btn:hover {
-    box-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
-    background: rgba(0, 242, 255, 0.05);
-  }
+  .final-btn:hover { box-shadow: 0 0 20px rgba(0, 242, 255, 0.3); background: rgba(0, 242, 255, 0.05); }
 
 </style>
 </head>
@@ -313,20 +264,17 @@
   <div id="cockpitBg"></div>
 
   <div id="stage">
-    
     <div id="narrativeBox"></div>
-
     <div id="clockContainer">
       <div id="clockBody">
         <div class="hand hour-hand"></div>
         <div class="hand minute-hand"></div>
+        <div class="hand second-hand"></div>
         <div class="center-dot"></div>
       </div>
       <div id="timeDialogue"></div>
     </div>
-
     <div id="userActions"></div>
-
   </div>
 
   <div id="finalBtnContainer">
@@ -334,26 +282,14 @@
   </div>
 
   <audio id="travelAudio" src="audio/travel.mp3" preload="auto"></audio>
-
   <script>
-    // --- MANDATORY FIX 1 & 5: DISABLE GESTURES & BACK NAV ---
+    // --- NAVIGATION & INPUT SAFETY ---
     history.pushState(null, "", location.href);
     window.addEventListener("popstate", () => {
       history.pushState(null, "", location.href);
     });
 
-    window.addEventListener("touchstart", e => {
-      if (!e.target.closest("button")) {
-        e.preventDefault();
-      }
-    }, { passive: false });
-
-    window.addEventListener("touchend", e => {
-      if (!e.target.closest("button")) {
-        e.preventDefault();
-      }
-    }, { passive: false });
-
+    // Block accidental background clicks
     window.addEventListener("click", e => {
       if (!e.target.closest("button")) {
         e.preventDefault();
@@ -361,14 +297,12 @@
       }
     }, true);
 
-
     // --- SETUP & PARAMS ---
     const urlParams = new URLSearchParams(window.location.search);
     const yearParam = urlParams.get('year');
     const year = yearParam ? parseInt(yearParam) : 1897;
     const isFuture = year > 2026;
 
-    // --- SAFETY LOCK VARIABLE ---
     let interactionEnabled = false;
 
     // --- DOM ELEMENTS ---
@@ -380,29 +314,32 @@
     const timeDialogue = document.getElementById('timeDialogue');
     const userActions = document.getElementById('userActions');
     const flashOverlay = document.getElementById('flashOverlay');
-    const blackout = document.getElementById('blackout');
     const cockpitBg = document.getElementById('cockpitBg');
     const finalBtnContainer = document.getElementById('finalBtnContainer');
     const travelAudio = document.getElementById('travelAudio');
+    const secondHand = document.querySelector('.second-hand');
+    const minuteHand = document.querySelector('.minute-hand');
+    const hourHand = document.querySelector('.hour-hand');
 
-    // Apply Cinematic Fonts
-    if (isFuture) {
-      body.classList.add('font-future');
-    } else {
-      body.classList.add('font-past');
-    }
+    if (isFuture) body.classList.add('font-future');
+    else body.classList.add('font-past');
 
     // --- AUDIO SYSTEM ---
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let audioCtx;
+    try {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    } catch (e) {}
+
     let tickInterval;
     let currentTickType = 'hostile';
+    let secondRotation = 0;
 
     function playTick() {
-      if (audioCtx.state === 'suspended') audioCtx.resume();
+      if (!audioCtx) return;
+      if (audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
       
       const osc = audioCtx.createOscillator();
       const gainNode = audioCtx.createGain();
-      
       osc.connect(gainNode);
       gainNode.connect(audioCtx.destination);
       
@@ -410,18 +347,21 @@
         osc.type = 'square'; 
         osc.frequency.setValueAtTime(800, audioCtx.currentTime); 
         osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.05);
-        gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime); 
-        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+        gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime); 
       } else {
         osc.type = 'sine';
         osc.frequency.setValueAtTime(300, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.1);
-        gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+        gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime); 
       }
       
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
       osc.start();
       osc.stop(audioCtx.currentTime + 0.2);
+
+      if (!clockBody.classList.contains('spin-cw') && !clockBody.classList.contains('spin-ccw')) {
+        secondRotation += 6;
+        if(secondHand) secondHand.style.transform = `translateX(-50%) rotate(${secondRotation}deg)`;
+      }
     }
 
     function startTicking(speed = 1000) {
@@ -434,8 +374,7 @@
       if (tickInterval) clearInterval(tickInterval);
     }
 
-    // --- HELPER FUNCTIONS ---
-
+    // --- SYSTEM LOGIC ---
     function flashScreen(color = 'white') {
       flashOverlay.style.background = color;
       flashOverlay.style.opacity = 1;
@@ -446,7 +385,6 @@
       narrativeBox.innerHTML = '';
       timeDialogue.innerHTML = '';
       userActions.innerHTML = '';
-      userActions.style.pointerEvents = "none";
     }
 
     function addTextLine(text, container, delay = 0, isBold = false) {
@@ -455,55 +393,37 @@
         p.className = 'fade-line' + (isBold ? ' big-bold' : '');
         p.innerHTML = text; 
         container.appendChild(p);
-        void p.offsetWidth; 
-        p.classList.add('visible');
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                p.classList.add('visible');
+            });
+        });
       }, delay);
     }
 
     function showButton(text, onClickDelay, callback) {
       setTimeout(() => {
-        userActions.style.pointerEvents = "auto";
-
         const btn = document.createElement('button');
         btn.className = 'cinematic-btn';
         btn.innerText = text;
-        
         interactionEnabled = true;
-
-        // MANDATORY FIX 4: BUTTONS MUST STOP PROPAGATION
         btn.onclick = (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-
           if (!interactionEnabled) return;
           interactionEnabled = false;
-
           btn.classList.remove('visible');
           btn.classList.add('sent-anim');
-          setTimeout(() => {
-            btn.remove();
-            userActions.style.pointerEvents = "none";
-            if(callback) callback();
-          }, 1000);
+          setTimeout(() => { btn.remove(); if(callback) callback(); }, 1000);
         };
         userActions.appendChild(btn);
-        void btn.offsetWidth;
-        btn.classList.add('visible');
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => { btn.classList.add('visible'); });
+        });
       }, onClickDelay);
-    }
-
-    function showSpeakerLabel() {
-      const label = document.createElement('div');
-      label.className = 'speaker-label';
-      label.innerText = 'ENTITY: TIME';
-      timeDialogue.appendChild(label);
-      setTimeout(() => label.style.opacity = 1, 100);
     }
 
     function clockSpeak(linesArray, nextAction, isAuto = false) {
       const oldLines = timeDialogue.querySelectorAll('.fade-line');
       oldLines.forEach(l => l.remove());
-      
       const dots = document.createElement('div');
       dots.className = 'thinking';
       dots.innerText = '•••';
@@ -511,207 +431,106 @@
 
       setTimeout(() => {
         dots.remove();
-        if(!timeDialogue.querySelector('.speaker-label')) showSpeakerLabel();
-
+        if(!timeDialogue.querySelector('.speaker-label')){
+            const label = document.createElement('div');
+            label.className = 'speaker-label';
+            label.innerText = 'ENTITY: TIME';
+            timeDialogue.appendChild(label);
+            setTimeout(() => label.style.opacity = 1, 100);
+        }
         let totalDelay = 0;
         linesArray.forEach((line, index) => {
           addTextLine(line, timeDialogue, index * 2000); 
           totalDelay = (index * 2000);
         });
-
-        const buffer = isAuto ? 4000 : 300; 
-        
-        if(nextAction) setTimeout(nextAction, totalDelay + 1500 + buffer);
-
-      }, 2000); 
+        if(nextAction) setTimeout(nextAction, totalDelay + 2000 + (isAuto ? 2000 : 0));
+      }, 1500); 
     }
 
     // --- STORY PHASES ---
-
-    // PHASE 0: THE JOKE
     function startPhase0() {
-      let lines = [];
-      if (isFuture) {
-        lines = [
-          "Return?",
-          "Nice joke.",
-          "You burned most of your fuel escaping a black hole’s gravity.",
-          "One wrong move and you’d be spaghettified.",
-          "That monster is far beyond reach now."
-        ];
-      } else {
-        lines = [
-          "Return?",
-          "Nice joke.",
-          "You drifted through a wormhole for hours to reach the past.",
-          "That tear in space is light-years away now.",
-          "There is no road back."
-        ];
-      }
-
+      let lines = isFuture ? 
+        ["Return?", "Nice joke.", "You burned most of your fuel escaping gravity.", "That monster is far beyond reach now."] : 
+        ["Return?", "Nice joke.", "You drifted through a wormhole for hours to reach the past.", "That tear in space is light-years away now.", "There is no road back."];
       lines.forEach((line, i) => addTextLine(line, narrativeBox, i * 1500));
       showButton("What? 😱", (lines.length * 1500) + 1000, startPhase1);
     }
 
-    // PHASE 1: VOID REVEAL
     function startPhase1() {
       flashScreen('black');
       clearNarrative();
-
-      const lines = ["YOU", "ARE", "STUCK", "HERE"];
-      
-      lines.forEach((line, i) => addTextLine(line, narrativeBox, i * 1000, true));
+      ["YOU", "ARE", "STUCK", "HERE"].forEach((line, i) => addTextLine(line, narrativeBox, i * 1000, true));
       showButton("This wasn’t supposed to happen…", 5000, startPhase2);
     }
 
-    // PHASE 2: TIME ARRIVES
     function startPhase2() {
       flashScreen('black');
       clearNarrative();
-      
       clockContainer.style.display = 'flex';
-      void clockContainer.offsetWidth;
-      clockContainer.style.opacity = 1;
-
+      requestAnimationFrame(() => { requestAnimationFrame(() => { clockContainer.style.opacity = 1; }); });
       currentTickType = 'hostile';
       clockBody.classList.add('shake');
       startTicking(800); 
-
-      clockSpeak([
-        "You humans are fascinating.",
-        "You don’t just move through me.",
-        "You touch me."
-      ], startPhase3);
+      clockSpeak(["You humans are fascinating.", "You don’t just move through me.", "You touch me."], startPhase3);
     }
 
-    // PHASE 3: ACTIVE CONVERSATION
     function startPhase3() {
-      clockSpeak([
-        "Tell me.",
-        "Why did you break causality?"
-      ], () => {
+      clockSpeak(["Tell me.", "Why did you break causality?"], () => {
         showButton("We were trying to understand the universe.", 300, () => {
-          clockSpeak([
-            "Understanding without restraint is dangerous.",
-            "Curiosity created fire.",
-            "It also created extinction."
-          ], startPhase4);
+          clockSpeak(["Understanding without restraint is dangerous.", "Curiosity created fire.", "It also created extinction.", "You bent relativity.", "You slipped through wormholes and black holes.", "You didn’t just travel...", "You manipulated me.", "I am not a place.", "I am the fourth dimension."], startPhase4);
         });
       });
     }
 
-    // PHASE 4: REVEAL
     function startPhase4() {
       clockBody.style.boxShadow = "0 0 40px rgba(255, 0, 0, 0.9)";
-      
-      clockSpeak([
-        "You bent relativity.",
-        "You slipped through wormholes and black holes.",
-        "You didn’t just travel...",
-        "You manipulated me.",
-        "I am not a place.",
-        "I am the fourth dimension."
-      ], startPhase5);
-    }
-
-    // PHASE 5: HUMAN DEFENSE
-    function startPhase5() {
       showButton("We didn’t mean to damage anything.", 300, () => {
-        
-        const oldLines = timeDialogue.querySelectorAll('.fade-line');
-        oldLines.forEach(l => l.remove());
-        
-        const dots = document.createElement('div');
-        dots.className = 'thinking';
-        dots.innerText = '•••';
-        timeDialogue.appendChild(dots);
-
-        setTimeout(() => {
-          dots.remove();
-          addTextLine("Intent does not erase consequence.", timeDialogue, 0);
-          addTextLine("But...", timeDialogue, 2000);
-          
-          setTimeout(() => {
-            addTextLine("Intent still matters.", timeDialogue, 0);
-            
-            clockBody.classList.add('purple');
-            
-            setTimeout(startPhase6, 5000);
-          }, 4000);
-          
-        }, 2000);
+        clockBody.classList.add('purple');
+        clockSpeak(["Intent does not erase consequence.", "But...", "Intent still matters.", "That brain of yours...", "It doesn’t belong here.", "Use it where it started.", "In your original era.", "Make something better... instead of breaking me."], startPhase5);
       });
     }
 
-    // PHASE 6: JUDGEMENT WITH HOPE
-    function startPhase6() {
-      clockBody.classList.remove('shake');
+    function startPhase5() {
       currentTickType = 'calm';
       startTicking(1000); 
-
-      clockSpeak([
-        "That brain of yours...",
-        "It doesn’t belong here.",
-        "Use it where it started.",
-        "In your original era.",
-        "Make something better... instead of breaking me."
-      ], () => {
-         clockBody.classList.remove('purple');
-         clockBody.classList.add('blue');
-         
-         setTimeout(startPhase7Pre, 4000);
-      }, true); 
+      showButton("I understand. I won’t try to control you again.", 1000, startPhase6);
     }
 
-    // PHASE 7 PRE: PAUSE
-    function startPhase7Pre() {
+    function startPhase6() {
       stopTicking();
-      setTimeout(() => {
-        showButton("I understand. I won’t try to control you again.", 300, startPhase7Action);
-      }, 1000);
+      clockSpeak(["You will move forward."], () => {
+        if(isFuture) {
+          clockBody.classList.add('spin-ccw');
+          secondHand.classList.add('spin-hand-fast-rev');
+          minuteHand.classList.add('spin-hand-medium-rev');
+          hourHand.classList.add('spin-hand-slow-rev');
+        } else {
+          clockBody.classList.add('spin-cw');
+          secondHand.classList.add('spin-hand-fast');
+          minuteHand.classList.add('spin-hand-medium');
+          hourHand.classList.add('spin-hand-slow');
+        }
+        travelAudio.play().catch(()=>{});
+        addTextLine(isFuture ? "Moving backward..." : "Moving forward...", timeDialogue, 0);
+        setTimeout(finalSequence, 6000);
+      });
     }
 
-    // PHASE 7 ACTION: SPIN
-    function startPhase7Action() {
-      if(isFuture) {
-        clockBody.classList.add('spin-ccw');
-      } else {
-        clockBody.classList.add('spin-cw');
-      }
-
-      travelAudio.currentTime = 0;
-      travelAudio.play().catch(e => console.log("Audio play error", e));
-
-      const line = isFuture ? "You will move backward." : "You will move forward.";
-      const oldLines = timeDialogue.querySelectorAll('.fade-line');
-      oldLines.forEach(l => l.remove());
-      addTextLine(line, timeDialogue, 0);
-
-      setTimeout(startPhase8, 3000);
-    }
-
-    // PHASE 8: RELEASE
-    function startPhase8() {
+    function finalSequence() {
       travelAudio.pause();
-      
-      flashOverlay.style.background = "linear-gradient(45deg, #ff0099, #493240, #00f2ff, #fff)";
+      flashOverlay.style.background = "linear-gradient(45deg, #ff0099, #00f2ff, #fff)";
       flashOverlay.style.opacity = 1;
-      
       stage.style.opacity = 0; 
-      
       setTimeout(() => {
          flashOverlay.style.opacity = 0;
          cockpitBg.style.opacity = 1;
-         finalBtnContainer.style.opacity = 1;
+         finalBtnContainer.style.display = 'block';
+         setTimeout(() => { finalBtnContainer.style.opacity = 1; }, 100);
          stage.style.display = 'none';
       }, 4000);
     }
 
-    // --- INIT ---
-    window.onload = () => {
-      setTimeout(startPhase0, 1000);
-    };
-
+    window.onload = () => { setTimeout(startPhase0, 1000); };
   </script>
 </body>
 </html>
