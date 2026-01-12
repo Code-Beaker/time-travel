@@ -1,180 +1,202 @@
-<!DOCTYPE html>  <html lang="en">  
-<head>  
-<meta charset="UTF-8">  
-<title>How did I reach here?</title>  
-<meta name="viewport" content="width=device-width, initial-scale=1.0">  <style>  
-*{  
-  margin:0;  
-  padding:0;  
-  box-sizing:border-box;  
-}  
-  
-body{  
-  min-height:100vh;  
-  background-size:cover;  
-  background-position:center;  
-  background-repeat:no-repeat;  
-  color:white;  
-  font-family: Arial, sans-serif;  
-  overflow-x:hidden;  
-}  
-  
-/* GLOBAL WRAPPER */  
-.page{  
-  min-height:100vh;  
-  padding:60px 20px 120px;  
-  display:flex;  
-  flex-direction:column;  
-  align-items:center;  
-  text-align:center;  
-}  
-  
-/* TITLE */  
-.title{  
-  font-size:42px;  
-  font-weight:900;  
-  opacity:0;  
-  animation: fadeIn 1.5s forwards;  
-}  
-  
-/* TIMELINE */  
-.timeline{  
-  margin-top:60px;  
-  font-size:18px;  
-  line-height:1.6;  
-}  
-  
-.step{  
-  opacity:0;  
-  animation: fadeUp 1s forwards;  
-}  
-  
-.arrow{  
-  font-size:32px;  
-  margin:15px 0;  
-  opacity:0;  
-  animation: fadeIn 1s forwards;  
-}  
-  
-/* DESCRIPTION */  
-.description{  
-  max-width:800px;  
-  margin-top:50px;  
-  font-size:17px;  
-  line-height:1.7;  
-  opacity:0;  
-  animation: fadeIn 2s forwards;  
-}  
-  
-/* BIG WELCOME */  
-.welcome{  
-  margin-top:70px;  
-  font-size:48px;  
-  font-weight:900;  
-  opacity:0;  
-  animation: fadeIn 2s forwards;  
-}  
-  
-/* SKY BUTTON */  
-.sky-btn{  
-  margin-top:40px;  
-  padding:15px 32px;  
-  font-size:18px;  
-  border:2px solid white;  
-  background:transparent;  
-  color:white;  
-  border-radius:30px;  
-  cursor:pointer;  
-  transition:0.3s;  
-}  
-  
-.sky-btn:hover{  
-  background:white;  
-  color:black;  
-}  
-  
-/* ANIMATIONS */  
-@keyframes fadeIn{  
-  to{opacity:1;}  
-}  
-@keyframes fadeUp{  
-  to{  
-    opacity:1;  
-    transform:translateY(0);  
-  }  
-}  
-  
-/* ===== TIMELINE THEMES ===== */  
-  
-/* 1897 */  
-body.past-1897{  
-  background-image:url("images/past_1897.jpg");  
-  font-family: "Courier New", monospace;  
-}  
-body.past-1897 .title,  
-body.past-1897 .welcome{  
-  color:#cfa66a;  
-}  
-  
-/* 1987 */  
-body.past-1987{  
-  background-image:url("images/past_1987.jpg");  
-  font-family: "Courier New", monospace;  
-}  
-body.past-1987 .title,  
-body.past-1987 .welcome{  
-  color:#00ff88;  
-}  
-  
-/* 2050 */  
-body.future-2050{  
-  background-image:url("images/future_2050.jpg");  
-  font-family: Arial, sans-serif;  
-}  
-body.future-2050 .title,  
-body.future-2050 .welcome{  
-  color:#00f2ff;  
-}  
-  
-/* 3079 */  
-body.future-3079{  
-  background-image:url("images/future_3079.jpg");  
-  font-family: Arial, sans-serif;  
-}  
-body.future-3079 .title,  
-body.future-3079 .welcome{  
-  color:#b36bff;  
-}  
-</style>  </head>  <body>  
-<div class="page">  
-  <div class="title">How did I reach here? 🤔</div>    <div class="timeline">  
-    <div class="step" style="animation-delay:1.2s">  
-      You launched from Earth aboard an experimental spacecraft.  
-    </div>  <div class="arrow" style="animation-delay:2.2s">↓</div>  
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>How did I reach here?</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<div class="step" style="animation-delay:3.2s">  
-  The spacecraft traveled through deep space and encountered an extreme gravitational anomaly.  
-</div>  
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
 
-<div class="arrow" style="animation-delay:4.2s">↓</div>  
+body{
+  min-height:100vh;
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  font-family: Arial, sans-serif;
+  overflow-x:hidden;
+}
 
-<div class="step" style="animation-delay:5.2s">  
-  Space and time were distorted, allowing the craft to exit reality at a different point in time.  
+/* GLOBAL WRAPPER */
+.page{
+  min-height:100vh;
+  padding:60px 20px 120px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+}
+
+/* TITLE */
+.title{
+  font-size:42px;
+  font-weight:900;
+  opacity:0;
+  animation: fadeIn 1.5s forwards;
+}
+
+/* TIMELINE */
+.timeline{
+  margin-top:60px;
+  font-size:18px;
+  line-height:1.6;
+}
+
+.step{
+  opacity:0;
+  animation: fadeUp 1s forwards;
+}
+
+.arrow{
+  font-size:32px;
+  margin:15px 0;
+  opacity:0;
+  animation: fadeIn 1s forwards;
+}
+
+/* DESCRIPTION */
+.description{
+  max-width:800px;
+  margin-top:50px;
+  font-size:17px;
+  line-height:1.7;
+  opacity:0;
+  animation: fadeIn 2s forwards;
+}
+
+/* BIG WELCOME */
+.welcome{
+  margin-top:70px;
+  font-size:48px;
+  font-weight:900;
+  opacity:0;
+  animation: fadeIn 2s forwards;
+}
+
+/* SKY BUTTON */
+.sky-btn{
+  margin-top:40px;
+  padding:15px 32px;
+  font-size:18px;
+  border:2px solid currentColor;
+  background:transparent;
+  color:inherit;
+  border-radius:30px;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.sky-btn:hover{
+  background:currentColor;
+  color:black;
+}
+
+/* ANIMATIONS */
+@keyframes fadeIn{
+  to{opacity:1;}
+}
+@keyframes fadeUp{
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+/* ===== TIMELINE THEMES ===== */
+
+/* 1897 */
+body.past-1897{
+  background-image:url("images/pastbg1897.jpg");
+  font-family:"Courier New", monospace;
+  color:#000000;
+}
+body.past-1897 .title,
+body.past-1897 .welcome{
+  color:#000000;
+}
+
+/* 1987 */
+body.past-1987{
+  background-image:url("images/pastbg1987.jpg");
+  font-family:"Courier New", monospace;
+  color:#000000;
+}
+body.past-1987 .title,
+body.past-1987 .welcome{
+  color:#000000;
+}
+
+/* 2050 */
+body.future-2050{
+  background-image:url("images/futurebg2050.jpg");
+  font-family: Arial, sans-serif;
+  color:#00ff88;
+  text-shadow:0 0 12px rgba(0,255,136,0.8);
+}
+body.future-2050 .title,
+body.future-2050 .welcome{
+  color:#00ff88;
+  text-shadow:0 0 20px rgba(0,255,136,1);
+}
+
+/* 3079 */
+body.future-3079{
+  background-image:url("images/futurebg3079.jpg");
+  font-family: Arial, sans-serif;
+  color:#00f2ff;
+  text-shadow:0 0 12px rgba(0,242,255,0.9);
+}
+body.future-3079 .title,
+body.future-3079 .welcome{
+  color:#00f2ff;
+  text-shadow:0 0 25px rgba(0,242,255,1);
+}
+</style>
+</head>
+
+<body>
+<div class="page">
+  <div class="title">How did I reach here? 🤔</div>
+
+  <div class="timeline">
+    <div class="step" style="animation-delay:1.2s">
+      You launched from Earth aboard an experimental spacecraft.
+    </div>
+
+    <div class="arrow" style="animation-delay:2.2s">↓</div>
+
+    <div class="step" style="animation-delay:3.2s">
+      The spacecraft traveled through deep space and encountered an extreme gravitational anomaly.
+    </div>
+
+    <div class="arrow" style="animation-delay:4.2s">↓</div>
+
+    <div class="step" style="animation-delay:5.2s">
+      Space and time were distorted, allowing the craft to exit reality at a different point in time.
+    </div>
+  </div>
+
+  <div class="description" style="animation-delay:6.5s">
+    According to Einstein’s theory of relativity, spacetime can bend under extreme gravity.
+    Wormholes and black holes are theoretical shortcuts through space and time.
+    By exploiting time dilation, gravitational slingshots, and relativistic effects,
+    your journey escaped the normal flow of time — delivering you here.
+  </div>
+
+  <div class="welcome" id="welcomeText" style="animation-delay:8.5s"></div>
+
+  <button class="sky-btn" style="animation-delay:9.5s">
+    Explore the night sky 🌌
+  </button>
 </div>
 
-  </div>    <div class="description" style="animation-delay:6.5s">  
-    Wormholes and black holes are predicted by Einstein’s theory of relativity.    
-    Under extreme gravity, spacetime can bend, stretch, and fold, allowing shortcuts through time itself.    
-    By exploiting relativistic effects such as time dilation and gravitational slingshots, your journey bypassed normal chronological flow — delivering you here.  
-  </div>    <div class="welcome" style="animation-delay:8.5s">  
-    Welcome to the timeline ✨  
-  </div>    <button class="sky-btn" style="animation-delay:9.5s">  
-    Explore the night sky 🌌  
-  </button>  
-</div>
-  <script>
+<script>
 const params = new URLSearchParams(window.location.search);
-const year = params.get("year") || "1897"; // fallback safety
+const year = params.get("year") || "1897";
 
 // Apply correct theme
 document.body.classList.remove(
@@ -189,7 +211,10 @@ else if (year === "1987") document.body.classList.add("past-1987");
 else if (year === "2050") document.body.classList.add("future-2050");
 else if (year === "3079") document.body.classList.add("future-3079");
 
-// SKY BUTTON → go to sky.html with SAME year
+// Dynamic welcome text
+document.getElementById("welcomeText").innerText = `Welcome to ${year} ✨`;
+
+// SKY BUTTON → go to sky.html
 const skyBtn = document.querySelector(".sky-btn");
 if (skyBtn) {
   skyBtn.addEventListener("click", () => {
@@ -197,5 +222,6 @@ if (skyBtn) {
   });
 }
 </script>
+
 </body>
 </html>
