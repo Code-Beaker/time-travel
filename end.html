@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>End Credits</title>
+    <style>
+        /* Base Page Setup */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000000;
+            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow-x: hidden;
+            overflow-y: auto; 
+        }
+
+        /* The scrolling container */
+        .credits-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: 100%;
+            animation: moveUp 45s linear forwards; 
+            will-change: transform;
+        }
+
+        /* Animation Logic */
+        @keyframes moveUp {
+            0% {
+                transform: translateY(100vh);
+            }
+            100% {
+                transform: translateY(-110%);
+            }
+        }
+
+        /* Content Styling */
+        .content-area {
+            max-width: 600px;
+            padding: 0 20px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            font-weight: bold;
+            margin-bottom: 100px;
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            font-weight: bold;
+            margin-top: 120px;
+            margin-bottom: 40px;
+        }
+
+        .credit-block {
+            margin-bottom: 60px;
+        }
+
+        .role {
+            font-size: 0.85rem;
+            color: #aaaaaa;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 10px;
+        }
+
+        .name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            line-height: 1.4;
+        }
+
+        .poetic-stanza {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 40px;
+            color: #eeeeee;
+        }
+
+        .final-quote-container {
+            margin-top: 150px;
+            margin-bottom: 100px;
+        }
+
+        .quote-main {
+            font-size: 1.4rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .quote-sub {
+            font-size: 1rem;
+            color: #cccccc;
+        }
+
+        /* Mobile specific adjustments */
+        @media (max-width: 480px) {
+            h1 { font-size: 1.5rem; }
+            .name { font-size: 1.1rem; }
+            .poetic-stanza { font-size: 1rem; }
+            .quote-main { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="bgm" src="audio/end.mp3" preload="auto"></audio>
+
+    <div class="credits-wrapper">
+        <div class="content-area">
+            
+            <h1>TIME TRAVEL SIMULATION</h1>
+
+            <div class="credit-block">
+                <div class="role">A concept by</div>
+                <div class="name">Abhinav</div>
+            </div>
+
+            <div class="credit-block">
+                <div class="role">Story by</div>
+                <div class="name">Abhinav</div>
+            </div>
+
+            <div class="credit-block">
+                <div class="role">Built using</div>
+                <div class="name">HTML · CSS · JavaScript</div>
+            </div>
+
+            <div class="credit-block">
+                <div class="role">AI tools involved</div>
+                <div class="name">Google Gemini AI</div>
+                <div class="name">ChatGPT</div>
+            </div>
+
+            <div class="credit-block">
+                <div class="role">Visual sequences</div>
+                <div class="name">Launch & Fly videos generated using VEO 3</div>
+            </div>
+
+            <h2>A NOTE ON CREATION</h2>
+
+            <p class="poetic-stanza">
+                Many people say<br>
+                coding with AI is simple.
+            </p>
+
+            <p class="poetic-stanza">
+                That you just ask,<br>
+                and the machine creates.
+            </p>
+
+            <p class="poetic-stanza">
+                But what they don’t see<br>
+                is the creativity behind the idea,<br>
+                the patience behind every fix,<br>
+                and the persistence behind every failure.
+            </p>
+
+            <p class="poetic-stanza">
+                AI doesn’t imagine timelines.<br>
+                AI doesn’t feel tension.<br>
+                AI doesn’t understand consequence.
+            </p>
+
+            <p class="poetic-stanza">
+                It only writes what it is told.
+            </p>
+
+            <p class="poetic-stanza">
+                You decide the vision.<br>
+                You decide the emotion.<br>
+                You decide when something feels right.
+            </p>
+
+            <p class="poetic-stanza">
+                AI is the instrument.<br>
+                You are the composer.
+            </p>
+
+            <div class="final-quote-container">
+                <div class="quote-main">
+                    TIME IS NOT A TOOL.<br>
+                    IT IS A CONSEQUENCE.
+                </div>
+                <div class="quote-sub">Use it wisely.</div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const audio = document.getElementById('bgm');
+        const targetVolume = 0.4;
+        const fadeTime = 3000; // 3 seconds
+        const step = 0.05;
+        const interval = fadeTime / (targetVolume / step);
+
+        function startExperience() {
+            audio.volume = 0;
+            audio.play().catch(e => {
+                // Browsers often block autoplay without interaction
+                console.log("Autoplay blocked. Tap anywhere to start audio.");
+            });
+
+            // Fade in logic
+            let fade = setInterval(() => {
+                if (audio.volume < targetVolume - step) {
+                    audio.volume += step;
+                } else {
+                    audio.volume = targetVolume;
+                    clearInterval(fade);
+                }
+            }, interval);
+
+            // Remove listeners once started
+            window.removeEventListener('click', startExperience);
+            window.removeEventListener('touchstart', startExperience);
+        }
+
+        // Trigger on load or interaction for browser compliance
+        window.addEventListener('load', startExperience);
+        window.addEventListener('click', startExperience);
+        window.addEventListener('touchstart', startExperience);
+    </script>
+</body>
+</html>
