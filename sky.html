@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>How did I reach here?</title>
+<title>Night Sky</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -13,189 +13,123 @@
 }
 
 body{
-  min-height:100vh;
-  background-size:cover;
-  background-position:center;
-  background-repeat:no-repeat;
-  color:white;
+  background:black;
+  overflow:hidden;
   font-family: Arial, sans-serif;
-  overflow-x:hidden;
+  color:white;
 }
 
-/* GLOBAL WRAPPER */
-.page{
-  min-height:100vh;
-  padding:60px 20px 120px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  text-align:center;
+/* VIDEO */
+video{
+  position:fixed;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
 }
 
-/* TITLE */
-.title{
-  font-size:42px;
-  font-weight:900;
+/* DESCRIPTION TEXT */
+#skyText{
+  position:fixed;
+  bottom:30px;
+  left:30px;
+  max-width:420px;
+  font-size:15px;
+  line-height:1.5;
   opacity:0;
-  animation: fadeIn 1.5s forwards;
+  transition:opacity 2s ease;
 }
 
-/* TIMELINE */
-.timeline{
-  margin-top:60px;
-  font-size:18px;
-  line-height:1.6;
-}
-
-.step{
-  opacity:0;
-  animation: fadeUp 1s forwards;
-}
-
-.arrow{
-  font-size:32px;
-  margin:15px 0;
-  opacity:0;
-  animation: fadeIn 1s forwards;
-}
-
-/* DESCRIPTION */
-.description{
-  max-width:800px;
-  margin-top:50px;
-  font-size:17px;
-  line-height:1.7;
-  opacity:0;
-  animation: fadeIn 2s forwards;
-}
-
-/* BIG WELCOME */
-.welcome{
-  margin-top:70px;
-  font-size:48px;
-  font-weight:900;
-  opacity:0;
-  animation: fadeIn 2s forwards;
-}
-
-/* SKY BUTTON */
-.sky-btn{
-  margin-top:40px;
-  padding:15px 32px;
-  font-size:18px;
+/* BUTTON */
+#backBtn{
+  position:fixed;
+  bottom:30px;
+  right:30px;
+  padding:14px 28px;
+  font-size:16px;
   border:2px solid white;
   background:transparent;
   color:white;
   border-radius:30px;
   cursor:pointer;
-  transition:0.3s;
+  opacity:0;
+  transition:opacity 2s ease, box-shadow 0.3s ease;
 }
 
-.sky-btn:hover{
-  background:white;
-  color:black;
-}
-
-/* ANIMATIONS */
-@keyframes fadeIn{
-  to{opacity:1;}
-}
-@keyframes fadeUp{
-  to{
-    opacity:1;
-    transform:translateY(0);
-  }
-}
-
-/* ===== TIMELINE THEMES ===== */
-
-/* 1897 */
-body.past-1897{
-  background-image:url("images/past_1897.jpg");
-  font-family: "Courier New", monospace;
-}
-body.past-1897 .title,
-body.past-1897 .welcome{
-  color:#cfa66a;
-}
-
-/* 1987 */
-body.past-1987{
-  background-image:url("images/past_1987.jpg");
-  font-family: "Courier New", monospace;
-}
-body.past-1987 .title,
-body.past-1987 .welcome{
-  color:#00ff88;
-}
-
-/* 2050 */
-body.future-2050{
-  background-image:url("images/future_2050.jpg");
-  font-family: Arial, sans-serif;
-}
-body.future-2050 .title,
-body.future-2050 .welcome{
-  color:#00f2ff;
-}
-
-/* 3079 */
-body.future-3079{
-  background-image:url("images/future_3079.jpg");
-  font-family: Arial, sans-serif;
-}
-body.future-3079 .title,
-body.future-3079 .welcome{
-  color:#b36bff;
+#backBtn:hover{
+  box-shadow:0 0 20px rgba(255,255,255,0.6);
 }
 </style>
 </head>
 
 <body>
-<div class="page">
-  <div class="title">How did I reach here? 🤔</div>
 
-  <div class="timeline">
-    <div class="step" style="animation-delay:1.2s">
-      You launched from Earth aboard an experimental spacecraft.
-    </div>
+<video id="skyVideo" autoplay muted playsinline></video>
 
-    <div class="arrow" style="animation-delay:2.2s">↓</div>
+<div id="skyText"></div>
 
-    <div class="step" style="animation-delay:3.2s">
-      The spacecraft traveled through deep space and encountered an extreme gravitational anomaly.
-    </div>
-
-    <div class="arrow" style="animation-delay:4.2s">↓</div>
-
-    <div class="step" style="animation-delay:5.2s">
-      Space and time were distorted, allowing the craft to exit reality at a different point in time.
-    </div>
-  </div>
-
-  <div class="description" style="animation-delay:6.5s">
-    Wormholes and black holes are predicted by Einstein’s theory of relativity.  
-    Under extreme gravity, spacetime can bend, stretch, and fold, allowing shortcuts through time itself.  
-    By exploiting relativistic effects such as time dilation and gravitational slingshots, your journey bypassed normal chronological flow — delivering you here.
-  </div>
-
-  <div class="welcome" style="animation-delay:8.5s">
-    Welcome to the timeline ✨
-  </div>
-
-  <button class="sky-btn" style="animation-delay:9.5s">
-    Explore the night sky 🌌
-  </button>
-</div>
+<button id="backBtn">Let’s go back to 2026</button>
 
 <script>
 const params = new URLSearchParams(window.location.search);
-const year = params.get("year");
+const year = params.get("year") || "1897";
 
-if(year === "1897") document.body.classList.add("past-1897");
-else if(year === "1987") document.body.classList.add("past-1987");
-else if(year === "2050") document.body.classList.add("future-2050");
-else if(year === "3079") document.body.classList.add("future-3079");
+const video = document.getElementById("skyVideo");
+const text = document.getElementById("skyText");
+const btn = document.getElementById("backBtn");
+
+// VIDEO SOURCE + TEXT
+if(year === "1897"){
+  video.src = "videos/sky1897.mp4";
+  text.innerText =
+    "In 1897, light pollution is almost nonexistent.\n" +
+    "The night sky is dense, alive, and overflowing with stars.\n" +
+    "What you see above is the sky in its purest form.";
+}
+else if(year === "1987"){
+  video.src = "videos/sky1987.mp4";
+  text.innerText =
+    "By 1987, artificial lights have begun to affect the night.\n" +
+    "Stars are still visible, but the darkness is slowly fading.";
+}
+else if(year === "2050"){
+  video.src = "videos/sky2050.mp4";
+  text.innerText =
+    "In 2050, light pollution dominates most cities.\n" +
+    "This sky is visible only from rare low-pollution regions.\n" +
+    "Many stars are already lost to human glow.";
+}
+else if(year === "3079"){
+  video.src = "videos/sky3079.mp4";
+  text.innerText =
+    "By 3079, artificial illumination overwhelms the planet.\n" +
+    "The stars still exist — but human eyes can no longer see them.";
+}
+
+// TEXT FADE IN
+setTimeout(()=>{
+  text.style.opacity = 1;
+},500);
+
+// TEXT FADE OUT AFTER 6s
+setTimeout(()=>{
+  text.style.opacity = 0;
+},6500);
+
+// BUTTON APPEAR AFTER 3s
+setTimeout(()=>{
+  btn.style.opacity = 1;
+},3000);
+
+// FREEZE VIDEO AT END
+video.addEventListener("ended",()=>{
+  video.pause();
+});
+
+// BUTTON ACTION
+btn.onclick = ()=>{
+  window.location.href = "time.html?year=2026";
+};
 </script>
 
 </body>
