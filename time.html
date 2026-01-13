@@ -104,7 +104,7 @@
   }
 
   .cinematic-btn {
-    background: transparent;
+        background: transparent;
     border: 1px solid rgba(255,255,255,0.4);
     color: rgba(255,255,255,0.8);
     padding: 15px 30px;
@@ -197,7 +197,7 @@
     transform: translateX(-50%) rotate(0deg); opacity: 1; z-index: 6; 
     transition: transform 0.1s cubic-bezier(0.4, 2.08, 0.55, 0.44); 
   }
-  .center-dot {
+    .center-dot {
     position: absolute; top: 50%; left: 50%; width: 12px; height: 12px;
     background: #fff; border-radius: 50%; transform: translate(-50%, -50%);
     box-shadow: 0 0 5px #fff; z-index: 7;
@@ -438,20 +438,70 @@
             timeDialogue.appendChild(label);
             setTimeout(() => label.style.opacity = 1, 100);
         }
-        let totalDelay = 0;
-        linesArray.forEach((line, index) => {
-          addTextLine(line, timeDialogue, index * 2000); 
-          totalDelay = (index * 2000);
-        });
-        if(nextAction) setTimeout(nextAction, totalDelay + 2000 + (isAuto ? 2000 : 0));
+
+        // --- BATCHING LOGIC START ---
+        let currentBatchIndex = 0;
+        const batchSize = 3;
+
+        function processBatch() {
+            if (currentBatchIndex >= linesArray.length) {
+                if(nextAction) setTimeout(nextAction, isAuto ? 2000 : 0);
+                return;
+            }
+
+            const batch = linesArray.slice(currentBatchIndex, currentBatchIndex + batchSize);
+            let batchDuration = 0;
+
+            batch.forEach((line, i) => {
+                addTextLine(line, timeDialogue, i * 2000);
+                batchDuration = i * 2000;
+            });
+
+            currentBatchIndex += batchSize;
+            const waitTime = batchDuration + 3000;
+
+            setTimeout(() => {
+                if (currentBatchIndex < linesArray.length) {
+                    const visibleLines = timeDialogue.querySelectorAll('.fade-line.visible');
+                    visibleLines.forEach(l => l.style.opacity = 0);
+                    
+                    setTimeout(() => {
+                        visibleLines.forEach(l => l.remove());
+                        processBatch();
+                    }, 1500);
+                } else {
+                    processBatch();
+                }
+            }, waitTime);
+        }
+
+        processBatch();
+        // --- BATCHING LOGIC END ---
+
       }, 1500); 
     }
 
     // --- STORY PHASES ---
     function startPhase0() {
-      let lines = isFuture ? 
-        ["Return?", "Nice joke.", "You burned most of your fuel escaping gravity.", "That monster is far beyond reach now."] : 
-        ["Return?", "Nice joke.", "You drifted through a wormhole for hours to reach the past.", "That tear in space is light-years away now.", "There is no road back."];
+      let lines;
+      if (isFuture) {
+          lines = [
+              "Return?",
+              "Nice joke.",
+              "You barely escaped the black hole’s gravity.",
+              "Most of your fuel is gone.",
+              "Your engines are damaged.",
+              "That singularity is millions of kilometers away now."
+          ];
+      } else {
+          lines = [
+              "Return?", 
+              "Nice joke.", 
+              "You drifted through a wormhole for hours to reach the past.", 
+              "That tear in space is light-years away now.", 
+              "There is no road back."
+          ];
+      }
       lines.forEach((line, i) => addTextLine(line, narrativeBox, i * 1500));
       showButton("What? 😱", (lines.length * 1500) + 1000, startPhase1);
     }
@@ -492,6 +542,9 @@
 
     function startPhase5() {
       currentTickType = 'calm';
+      clockBody.classList.remove('shake');
+      clockBody.classList.remove('purple');
+      clockBody.classList.add('blue');
       startTicking(1000); 
       showButton("I understand. I won’t try to control you again.", 1000, startPhase6);
     }
